@@ -1,9 +1,9 @@
 $LogDate = Get-Date -format ddMMyyyy
 
-## Crypto stuff
-$Passphrase="" ## Add a 16 digit string here
-$SaltCrypto="" ## Add a 8 digit string here
-$INITPW="" ## Add a 8 digit string here
+## Global Vars
+$Passphrase=""
+$SaltCrypto=""
+$INITPW=""
 
 ## endregion Global Vars
 
@@ -14,9 +14,9 @@ Function Get-SettingsINI {
     return $SettingsINI 
 }
 
-Function Get-CredentailINI {
-    $CredentailINI = Get-Content "$PSScriptRoot\_data\credentail.ini"
-    return $CredentailINI
+Function Get-CredentialINI {
+    $CredentialINI = Get-Content "$PSScriptRoot\_data\Credential.ini"
+    return $CredentialINI
 }
 
 [Reflection.Assembly]::LoadWithPartialName("System.Security") 
@@ -29,7 +29,7 @@ function Encrypt-String($String, $Passphrase=$Passphrase, $salt=$SaltCrypto, $in
  
     $r.Key = (new-Object Security.Cryptography.PasswordDeriveBytes $pass, $salt, "SHA1", 5).GetBytes(32) #256/8 
     $r.IV = (new-Object Security.Cryptography.SHA1Managed).ComputeHash( [Text.Encoding]::UTF8.GetBytes($init) )[0..15] 
-     
+
     $c = $r.CreateEncryptor() 
     $ms = new-Object IO.MemoryStream 
     $cs = new-Object Security.Cryptography.CryptoStream $ms,$c,"Write" 
@@ -125,27 +125,7 @@ Function CMD-Log {
  }
         }
         
-Function Tool-Log {
-         Param
-        (
-        [Parameter(Mandatory=$true)]
- [string]$Permission
-        )
-         if($UN -eq $null)
- {
- $user = $env:USERNAME
- $HostName = hostname
- $date = $LogDate
- Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: Tool `n $Tool" | Out-File "$LogPath\Tool-Log_$date.log" -Append
- }
-        else
- {
- $user = $UN
- $HostName = hostname
- $date = $LogDate
- Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: Tool `n $Tool" | Out-File "$LogPath\Tool-Log_$date.log" -Append
- }
-        }
+
 Function File-Log {
         Param
         (
@@ -261,12 +241,12 @@ Function Get-SettingsFromIni {
     Set-Variable -Name EncDomainADminGroup -Value $DomainADminGroup -Scope Global
     Set-Variable -Name EncLogPath -Value $LogPath -Scope Global
 }
-Function Get-CredentailFromIni {
-    $credentailInfo = Get-CredentailINI
-    $ADMUser = $credentailInfo[1]
-    $ADMPass = $credentailInfo[2]
-    $SUser = $credentailInfo[4]
-    $SPass = $credentailInfo[5]
+Function Get-CredentialFromIni {
+    $CredentialInfo = Get-CredentialINI
+    $ADMUser = $CredentialInfo[1]
+    $ADMPass = $CredentialInfo[2]
+    $SUser = $CredentialInfo[4]
+    $SPass = $CredentialInfo[5]
     Set-Variable -Name EncADMUser -Value $ADMUser -Scope Global
     Set-Variable -Name EncADMPass -Value $ADMPass -Scope Global
     Set-Variable -Name EncSUser -Value $SUser -Scope Global
@@ -356,7 +336,7 @@ Function Decrypt-Settings {
 
     Set-Variable -Name DecLogPath -Value $PathLog -Scope Global
 }
-function Decrypt-Credentail {
+function Decrypt-Credential {
     $ADMUsername = $EncADMUser -replace "ADMUsername="
     $ADMUsername = Decrypt-String $ADMUsername
 
@@ -378,20 +358,21 @@ Function Write-Settings {
     $ContentSettings = @("[Settings]", "SettingsSet=1", "[Admin Settings]", "DomainAdminGroup=$($EncDomainADminGroupSet)", "[Log Path]", "LogPath=$(EncLogPathSet)")
     Set-Content -Path "$PSScriptRoot\_data\settings.ini" -Value $ContentSettings
     $ContentCredntail = @("[ADM]", "ADMUsername=($EncADMUserSet)", "ADMPassword=$($EncADMPassSet)", "[Standard User]", "Username=$($EncSUserSet)", "Password=$($EncSPassSet)")
-    Set-Content -Path "$PSScriptRoot\_data\credentail.ini" -Value $ContentCredntail
+    Set-Content -Path "$PSScriptRoot\_data\Credential.ini" -Value $ContentCredntail
 }
 Function Read-Settings {
     $Settings_LB.Items.Add("[settings.ini]")
     $Settings_LB.Items.Add("DomainAdminGroup: $($DecDomainADminGroup)")
-    $Settings_LB.Items.Add("[credentail.ini]")
+    $Settings_LB.Items.Add("LogPath: $($DecLogPath)")
+    $Settings_LB.Items.Add("[Credential.ini]")
     $Settings_LB.Items.Add("ADMUsername: $($DecADMUser)")
     $Settings_LB.Items.Add("ADMPassword: $($DecADMPass)")
     $Settings_LB.Items.Add("Username: $($DecSUser)")
     $Settings_LB.Items.Add("Password: $($DecSPass)")
 }
 Function Set-Login-Crednetail{
-    Get-CredentailFromINI
-    Decrypt-Credentail
+    Get-CredentialFromINI
+    Decrypt-Credential
     Set-Variable -Name LoginUsernameADM -Value $DecADMUser -Scope Global
     Set-Variable -Name LoginPasswordADM -Value $DecADMPass -Scope Global
     Set-Variable -Name LoginUsername -Value $DecSUser -Scope Global
@@ -400,14 +381,25 @@ Function Set-Login-Crednetail{
 Function Set-Settings{
     Get-SettingsFromINI
     Decrypt-Settings
-    Set-Variable -Name ServerAdminGroup -Value $DecDomainADminGroup
-    Set-Variable -Name LogPath -Value $DecLogPath
+    Set-Variable -Name ServerAdminGroup -Value $DecDomainADminGroup -Scope Global
+    Set-Variable -Name LogPath -Value $DecLogPath -Scope Global
 }
-
+Function Load-PS-Log{
+    $PSLog= Get-Content -Path "$LogPath\PS-Log_$date.log"
+    Set-Variable -Name LoadedPSLog -Value $PSLog -Scope Global
+}
+Function Load-CMD-Log{
+    $CMDLog= Get-Content -Path "$LogPath\CMD-Log_$date.log"
+    Set-Variable -Name LoadedCMDLog -Value $CMDLog -Scope Global
+}
+Function Load-File-Log{
+    $FileLog= Get-Content -Path "$LogPath\File-Log_$date.log"
+    Set-Variable -Name LoadedFileLog -Value $FileLog -Scope Global
+}
 ## Form Login
 
 
-Add-Type -AssemblyName PresentationCore, PresentationFramework
+Add-Type -AssemblyName PresentationCore, PresentationFramework, System.Windows.Forms
 
 $XamlLogin = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="600" Height="400" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Background="#35333a" BorderThickness="0" BorderBrush="#666374" Foreground="#514e5d" OpacityMask="#5b586d" Name="LoginPageWPF" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Title="Login Security-Tool" WindowChrome.IsHitTestVisibleInChrome="True">
@@ -456,7 +448,7 @@ $UsernameTB.Add_GotFocus({ClearUsername $this $_})
 $PasswordTB.Add_GotFocus({ClearPassword $this $_})
 $LoginBT.Add_Click({Login $this $_})
 
-## Set Settings and Credentail
+## Set Settings and Credential
 Set-Login-Crednetail
 Set-Settings
 
@@ -464,6 +456,7 @@ $WindowLogin.ShowDialog()
 
 if($AdminLogin -eq $true)
 {
+    
 ## Form Admin
 $XamlAdmin = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="700" Height="600" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Background="#35333a" BorderThickness="0" BorderBrush="#666374" Foreground="#514e5d" OpacityMask="#5b586d" Name="TestWPF1" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Title="Security-Tool User" WindowChrome.IsHitTestVisibleInChrome="True">
@@ -503,8 +496,9 @@ $XamlAdmin = @"
 				<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Close" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="198,406,0,0" Name="Close_BT"/>
 				<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Check Local Admin" HorizontalAlignment="Left" VerticalAlignment="Top" Width="130" Margin="330,281,0,0" Name="CLA_BT"/>
 				<TextBox Background="#171520" Foreground="#ffffff" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="23" Width="300" TextWrapping="Wrap" Margin="94,229,0,0" Name="FilePath_TB"/>
-				<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Open" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="428,229,0,0" Name="OpenFile_BT"/>
-				<ProgressBar HorizontalAlignment="Left" Height="10" VerticalAlignment="Top" Width="100" Margin="185,336,0,0" Name="Status_PB" Foreground="#ffffff" Background="#000000"/>
+                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="180,485,0,0" Name="Cleear_BT"/>
+                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Load Log" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="260,485,0,0" Name="Load_BT"/>
+				
 				<ComboBox Background="#ffffff" Foreground="#171520" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="95,281,0,0" Name="Mode_CB"/>
 				</Grid>
 			</TabItem>
@@ -567,6 +561,27 @@ $Tab1BT.Add_Click({Tab1Click $this $_})
 $Tab2BT.Add_Click({Tab2Click $this $_})
 $Tab3BT.Add_Click({Tab3Click $this $_})
 ## Buttons
+$Load_BT.Add_Click({
+    $PSLog=Load-PS-Log
+    $CMDLog=Load-CMD-Log
+    $FileLog=Load-File-Log
+    $Output_LB.items.Clear()
+    $Output_LB.items.Add("PowerShell Log")
+    foreach($entry in $PSLog)
+    {
+        $Output_LB.items.Add($entry)
+    }
+    $Output_LB.items.Add("CMD Log")
+    foreach($entry in $CMDLog)
+    {
+        $Output_LB.items.Add($entry)
+    }
+    $Output_LB.items.Add("File Log")
+    foreach($entry in $FileLog)
+    {
+        $Output_LB.items.Add($entry)
+    }
+})
 
 $CMD_BT.Add_Click({
     if($asAdmin_CB.Checked -eq $true)
@@ -577,12 +592,12 @@ $CMD_BT.Add_Click({
     {
         $Check = $false
     }
-    if($Check -eq $True)
+    if($Check -eq $false)
     {
-        
+
         Clear-Content C:\Users\$($env:USERNAME)\AppData\Local\clink\.history
-        $Settings_LB.Items.Add("$(GD)   CMD successfully started.")
-        $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\cmd.exe -verb runAs}" -WorkingDirectory $env:windir -PassThru -Wait
+        $Output_LB.Items.Add("$(GD)   CMD successfully started.")
+        $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\cmd.exe}" -WorkingDirectory $env:windir -PassThru -Wait
          
         $Process.WaitForExit()
          if($UN -eq $null)
@@ -605,8 +620,9 @@ $CMD_BT.Add_Click({
     {
         
         if($CredSet -eq $True -and $Credentials -ne $null){
+
         Clear-Content C:\Users\$($env:USERNAME)\AppData\Local\clink\.history
-         $Settings_LB.Items.Add("$(GD)   CMD successfully started as Admin.")
+         $Output_LB.Items.Add("$(GD)   CMD successfully started as Admin.")
         $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\cmd.exe -verb runAs}" -WorkingDirectory $env:windir -PassThru -Wait
         
         $Process.WaitForExit()
@@ -625,7 +641,7 @@ $CMD_BT.Add_Click({
             CMD-Log -Permission Admin
         }else{
         [System.Windows.Forms.MessageBox]::Show('Credntials not set!', 'Error', 'Ok', 'Error')
-         $Settings_LB.Items.Add("$(GD)   CMD couldn't be started")
+         $Output_LB.Items.Add("$(GD)   CMD couldn't be started")
         }
         
     }
@@ -639,55 +655,59 @@ $PowerShell_BT.Add_Click({
     {
         $Check = $false
     }
-    if($Check -eq $True)
+    if($Check -eq $false)
     {
         
+        
         Clear-Content C:\Users\$($env:USERNAME)\AppData\Local\clink\.history
-        $Settings_LB.Items.Add("$(GD)   CMD successfully started.")
-        $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\WindowsPowerShell\v1.0\\PowerShell.exe -verb runAs}" -WorkingDirectory $env:windir -PassThru -Wait
+        $Output_LB.Items.Add("$(GD)   PowerShell successfully started.")
+        $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\WindowsPowerShell\v1.0\\PowerShell.exe}" -WorkingDirectory $env:windir -PassThru -Wait
          
         $Process.WaitForExit()
-         if($UN -eq $null)
-            {
-            $user = $env:USERNAME
-            $history = Get-Content  C:\Users\$($user)\AppData\Local\clink\.history
-            Set-Variable -Name CMDHistory -Value $history -Scope global
-            }
-        else
-            {
-            $user = $UN
-            $history = Get-Content  C:\Users\$($user)\AppData\Local\clink\.history
-            Set-Variable -Name CMDHistory -Value $history -Scope global
-            }
-            $Process.WaitForExit()
-            CMD-Log -Permission Admin
+        if($UN -eq $null)
+           {
+           $user = $env:USERNAME
+           $history = Get-Content  C:\Users\$($user)\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+           Set-Variable -Name PSHistory -Value $history -Scope global
+           }
+       else
+           {
+           $user = $UN
+           $history = Get-Content  C:\Users\$($user)\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+           Set-Variable -Name PSHistory -Value $history -Scope global
+           }
+           $Process.WaitForExit()
+           PS-Log -Permission User
         
     }
         else
     {
         
         if($CredSet -eq $True -and $Credentials -ne $null){
+            
+            
         Clear-Content C:\Users\$($env:USERNAME)\AppData\Local\clink\.history
-         $Settings_LB.Items.Add("$(GD)   CMD successfully started as Admin.")
+         $Output_LB.Items.Add("$(GD)   PowerShell successfully started as Admin.")
          $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\WindowsPowerShell\v1.0\\PowerShell.exe -verb runAs}" -WorkingDirectory $env:windir -PassThru -Wait
         
-        $Process.WaitForExit()
+         $Process.WaitForExit()
          if($UN -eq $null)
             {
             $user = $env:USERNAME
-            $history = Get-Content  C:\Users\$($user)\AppData\Local\clink\.history
-            Set-Variable -Name CMDHistory -Value $history -Scope global
+            $history = Get-Content  C:\Users\$($user)\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+            Set-Variable -Name PSHistory -Value $history -Scope global
             }
         else
             {
             $user = $UN
-            $history = Get-Content  C:\Users\$($user)\AppData\Local\clink\.history
-            Set-Variable -Name CMDHistory -Value $history -Scope global
+            $history = Get-Content  C:\Users\$($user)\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+            Set-Variable -Name PSHistory -Value $history -Scope global
             }
-            CMD-Log -Permission Admin
+            $Process.WaitForExit()
+            PS-Log -Permission Admin
         }else{
         [System.Windows.Forms.MessageBox]::Show('Credntials not set!', 'Error', 'Ok', 'Error')
-         $Settings_LB.Items.Add("$(GD)   CMD couldn't be started.")
+         $Output_LB.Items.Add("$(GD)   PowerShell couldn't be started.")
         }
         
     }
@@ -696,7 +716,8 @@ $AD_BT.Add_Click({
     $cmd="$env:windir\system32\rundll32.exe"
     $param="dsquery.dll,OpenQueryWindow"
     Start-Process $cmd $param
-$Settings_LB.Items.Add("$(GD)   Active Directory query successfully started.")
+    $Output_LB.Items.Add("$(GD)   Active Directory query successfully started.")
+    
 })
 $SM_BT.Add_Click({
     if($asAdmin_CB.Checked -eq $true)
@@ -707,25 +728,28 @@ $SM_BT.Add_Click({
     {
         $Check = $false
     }
-    if($Check -eq $True)
+    if($Check -eq $false)
     {
         if($CredSet -eq $True -and $Credentials -ne $null){
-
-             Start-Process -WindowStyle Hidden "PowerShell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\ServerManager.exe -verb runas}"
-             $Settings_LB.Items.Add("$(GD)   Server Manager successfully started.")
+            
+            
+             Start-Process -WindowStyle Hidden "PowerShell.exe" -ArgumentList -Credential $Credentials "-noprofile -command &{Start-Process C:\Windows\system32\ServerManager.exe -verb runas}"
+             $Output_LB.Items.Add("$(GD)   Server Manager successfully started.")
             
             }
             else
             {
+                
+                
                 Start-Process -WindowStyle Hidden "PowerShell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\ServerManager.exe}"
-                $Settings_LB.Items.Add("$(GD)   Server Manager successfully started.")
+                $Output_LB.Items.Add("$(GD)   Server Manager successfully started.")
             }
     }
 })
 $Credential_BT.Add_Click({
     if($UN -eq $null){$TempUN = $env:USERNAME}else{$TempUN = $UN}
-    $Settings_LB.items.Clear()
-     $Settings_LB.Items.Add("Current loged in User: $($TempUN)")
+    $Output_LB.items.Clear()
+    $Output_LB.Items.Add("Current loged in User: $($TempUN)")
     
     $CredSet = $null
     $UN = $null
@@ -745,7 +769,7 @@ $Credential_BT.Add_Click({
                 $UserName = $Cred.UserName
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
 
-                $Settings_LB.Items.Add("$(GD)    Current user switched to $UserName.")                
+                $Output_LB.Items.Add("$(GD)    Current user switched to $UserName.")                
             }
         }
         elseif($Mode_CB.Text -eq "Local")
@@ -759,7 +783,7 @@ $Credential_BT.Add_Click({
                 $UserName = $Cred.UserName
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
 
-                $Settings_LB.Items.Add("$(GD)   Current user switched to $UserName.")                
+                $Output_LB.Items.Add("$(GD)   Current user switched to $UserName.")                
             }            
         } 
     }	
@@ -771,12 +795,12 @@ $CLA_BT.Add_Click({
         if($ADMCheck -eq $True)
             {
             if($UN -eq $null){$Name = $env:username}else{$Name = $UN}
-            $Settings_LB.Items.Add("$(GD)   User $Name is in the Admin group.")
+            $Output_LB.Items.Add("$(GD)   User $Name is in the Admin group.")
             }
         else
             {
             if($UN -eq $null){$Name = $env:username}else{$Name = $UN}
-            $Settings_LB.Items.Add("$(GD)   User $Name is not in the Admin group.")
+            $Output_LB.Items.Add("$(GD)   User $Name is not in the Admin group.")
             }
     }
     else
@@ -785,12 +809,12 @@ $CLA_BT.Add_Click({
         if($ADMCheck -eq $True)
             {
             if($UN -eq $null){$Name = $env:username}else{$Name = $UN}
-            $Settings_LB.Items.Add("$(GD)   User $Name is in the Admin group.")
+            $Output_LB.Items.Add("$(GD)   User $Name is in the Admin group.")
             }
         else
             {
             if($UN -eq $null){$Name = $env:username}else{$Name = $UN}
-            $Settings_LB.Items.Add("$(GD)   User $Name is not in the Admin group.")
+            $Output_LB.Items.Add("$(GD)   User $Name is not in the Admin group.")
             } 
     }
 })
@@ -803,15 +827,17 @@ $OpenFile_BT.Add_Click({
     {
         $Check = $false
     }
-    if($Check -eq $True)
+    if($Check -eq $false)
     {
-        if($FilePath_TB.Text -ne $null)
+        if($FilePath_TB.Text -ne "")
         {
             if(Test-Path -Path $FilePath_TB.Text)
             {
+                
+                
                 Set-Variable -Name File -Value $FilePath_TB.Text -Scope global
-                Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process $($File.FileName) -verb runAs}" -WorkingDirectory $env:windir -PassThru
-                $Settings_LB.Items.Add("Programm successfully started as Admin $(GD)")
+                Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process $($File.FileName)}" -WorkingDirectory $env:windir -PassThru
+                $Output_LB.Items.Add("$(GD)   Programm successfully started as Admin.")
                 File-Log -Permission Admin
 
             }
@@ -820,7 +846,7 @@ $OpenFile_BT.Add_Click({
                 [System.Windows.Forms.MessageBox]::Show('Path is invalid.', 'Error', 'Ok', 'Error')
             }
         }
-        elseif($FilePath_TB.Text -eq $null)
+        elseif($FilePath_TB.Text -eq "")
         {
             $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog 
             $OpenFileDialog.initialDirectory = $initialDirectory
@@ -829,21 +855,24 @@ $OpenFile_BT.Add_Click({
             $OpenFileDialog.ShowDialog() | Out-Null 
             $OpenFileDialog.filename 
             Set-Variable -Name File -Value $OpenFileDialog -Scope global
-
-            Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process $($File.FileName) -verb runAs}" -WorkingDirectory $env:windir -PassThru
-            $Settings_LB.Items.Add("Programm successfully started as Admin $(GD)")
+            
+            
+            Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process $($File.FileName) -verb runAs}" -WorkingDirectory $env:windir -PassThru
+            $Output_LB.Items.Add("$(GD)   Programm successfully started as Admin.")
             File-Log -Permission User  
         }
     }
     else
     {
-        if($FilePath_TB.Text -ne $null)
+        if($FilePath_TB.Text -ne "")
         {
             if(Test-Path -Path $FilePath_TB.Text)
             {
+                
+                
                 Set-Variable -Name File -Value $FilePath_TB.Text -Scope global
                 Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process $($File.FileName)}" -WorkingDirectory $env:windir -PassThru
-                $Settings_LB.Items.Add("Programm successfully started as Admin $(GD)")
+                $Output_LB.Items.Add("$(GD)   Programm successfully started as Admin.")
                 File-Log -Permission Admin
 
             }
@@ -852,7 +881,7 @@ $OpenFile_BT.Add_Click({
                 [System.Windows.Forms.MessageBox]::Show('Path is invalid.', 'Error', 'Ok', 'Error')    
             }
         }
-        elseif($FilePath_TB.Text -eq $null)
+        elseif($FilePath_TB.Text -eq "")
         {
             $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog 
             $OpenFileDialog.initialDirectory = $initialDirectory
@@ -861,9 +890,10 @@ $OpenFile_BT.Add_Click({
             $OpenFileDialog.ShowDialog() | Out-Null 
             $OpenFileDialog.filename 
             Set-Variable -Name File -Value $OpenFileDialog -Scope global
-
+            
+            
             Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process $($File.FileName)}" -WorkingDirectory $env:windir -PassThru
-            $Settings_LB.Items.Add("Programm successfully started as Admin $(GD)")
+            $Output_LB.Items.Add("$(GD)   Programm successfully started as Admin.")
             File-Log -Permission User  
         }  
     }
@@ -883,11 +913,11 @@ $Go_BT.Add_Click({
 })
 $Values_BT.Add_Click({
     # Get Values from Ini
-    Get-CredentailFromIni
-    Get-CredentailINI
+    Get-CredentialFromIni
+    Get-CredentialINI
     # Decrypt Values
     Decrypt-Settings
-    Decrypt-Credentail
+    Decrypt-Credential
     # Read Settings
     Read-Settings
 })
@@ -941,7 +971,7 @@ $XamlUser = @"
 				<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Check Local Admin" HorizontalAlignment="Left" VerticalAlignment="Top" Width="130" Margin="330,281,0,0" Name="CLA_BT"/>
 				<TextBox Background="#171520" Foreground="#ffffff" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="23" Width="300" TextWrapping="Wrap" Margin="94,229,0,0" Name="FilePath_TB"/>
 				<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Open" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="428,229,0,0" Name="OpenFile_BT"/>
-				<ProgressBar HorizontalAlignment="Left" Height="10" VerticalAlignment="Top" Width="100" Margin="185,336,0,0" Name="Status_PB" Foreground="#ffffff" Background="#000000"/>
+				
 				<ComboBox Background="#ffffff" Foreground="#171520" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="95,281,0,0" Name="Mode_CB"/>
 			</Grid>
 			</TabItem>
@@ -950,7 +980,8 @@ $XamlUser = @"
 				<Grid Background="#262335">
 				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Text="Output" FontSize="14" FontWeight="Bold" Height="21" Foreground="#ffffff"/>
 				<ListBox Foreground="#ffffff" Background="#000000" HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="0" Height="400" VerticalAlignment="Top" Width="500" Margin="25,70,0,0" Name="Output_LB"/>
-				<Button FontSize="20" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="240,485,0,0" Name="Cleear_BT"/>
+                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="180,485,0,0" Name="Cleear_BT"/>
+                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Load Log" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="260,485,0,0" Name="Load_BT"/>
 				</Grid>
 			</TabItem>
 
@@ -977,6 +1008,27 @@ $xmlUser.SelectNodes("//*[@Name]") | ForEach-Object { Set-Variable -Name $_.Name
 $Tab1BT.Add_Click({Tab1Click $this $_})
 $Tab2BT.Add_Click({Tab2Click $this $_})
 ## Buttons
+$Load_BT.Add_Click({
+    $PSLog=Load-PS-Log
+    $CMDLog=Load-CMD-Log
+    $FileLog=Load-File-Log
+    $Output_LB.items.Clear()
+    $Output_LB.items.Add("PowerShell Log")
+    foreach($entry in $PSLog)
+    {
+        $Output_LB.items.Add($entry)
+    }
+    $Output_LB.items.Add("CMD Log")
+    foreach($entry in $CMDLog)
+    {
+        $Output_LB.items.Add($entry)
+    }
+    $Output_LB.items.Add("File Log")
+    foreach($entry in $FileLog)
+    {
+        $Output_LB.items.Add($entry)
+    }
+})
 $CMD_BT.Add_Click({
     if($asAdmin_CB.Checked -eq $true)
     {
@@ -986,12 +1038,13 @@ $CMD_BT.Add_Click({
     {
         $Check = $false
     }
-    if($Check -eq $True)
+    if($Check -eq $false)
     {
         
+        
         Clear-Content C:\Users\$($env:USERNAME)\AppData\Local\clink\.history
-        $Settings_LB.Items.Add("$(GD)   CMD successfully started.")
-        $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\cmd.exe -verb runAs}" -WorkingDirectory $env:windir -PassThru -Wait
+        $Output_LB.Items.Add("$(GD)   CMD successfully started.")
+        $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\cmd.exe}" -WorkingDirectory $env:windir -PassThru -Wait
          
         $Process.WaitForExit()
          if($UN -eq $null)
@@ -1014,8 +1067,10 @@ $CMD_BT.Add_Click({
     {
         
         if($CredSet -eq $True -and $Credentials -ne $null){
+            
+            
         Clear-Content C:\Users\$($env:USERNAME)\AppData\Local\clink\.history
-         $Settings_LB.Items.Add("$(GD)   CMD successfully started as Admin.")
+         $Output_LB.Items.Add("$(GD)   CMD successfully started as Admin.")
         $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\cmd.exe -verb runAs}" -WorkingDirectory $env:windir -PassThru -Wait
         
         $Process.WaitForExit()
@@ -1034,7 +1089,7 @@ $CMD_BT.Add_Click({
             CMD-Log -Permission Admin
         }else{
         [System.Windows.Forms.MessageBox]::Show('Credntials not set!', 'Error', 'Ok', 'Error')
-         $Settings_LB.Items.Add("$(GD)   CMD couldn't be started")
+         $Output_LB.Items.Add("$(GD)   CMD couldn't be started")
         }
         
     }
@@ -1048,64 +1103,70 @@ $PowerShell_BT.Add_Click({
     {
         $Check = $false
     }
-    if($Check -eq $True)
+    if($Check -eq $false)
     {
         
+        
         Clear-Content C:\Users\$($env:USERNAME)\AppData\Local\clink\.history
-        $Settings_LB.Items.Add("$(GD)   CMD successfully started.")
-        $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\WindowsPowerShell\v1.0\\PowerShell.exe -verb runAs}" -WorkingDirectory $env:windir -PassThru -Wait
+        $Output_LB.Items.Add("$(GD)   PowerShell successfully started.")
+        $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\WindowsPowerShell\v1.0\\PowerShell.exe}" -WorkingDirectory $env:windir -PassThru -Wait
          
         $Process.WaitForExit()
-         if($UN -eq $null)
-            {
-            $user = $env:USERNAME
-            $history = Get-Content  C:\Users\$($user)\AppData\Local\clink\.history
-            Set-Variable -Name CMDHistory -Value $history -Scope global
-            }
-        else
-            {
-            $user = $UN
-            $history = Get-Content  C:\Users\$($user)\AppData\Local\clink\.history
-            Set-Variable -Name CMDHistory -Value $history -Scope global
-            }
-            $Process.WaitForExit()
-            CMD-Log -Permission Admin
+        if($UN -eq $null)
+           {
+           $user = $env:USERNAME
+           $history = Get-Content  C:\Users\$($user)\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+           Set-Variable -Name PSHistory -Value $history -Scope global
+           }
+       else
+           {
+           $user = $UN
+           $history = Get-Content  C:\Users\$($user)\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+           Set-Variable -Name PSHistory -Value $history -Scope global
+           }
+           $Process.WaitForExit()
+           PS-Log -Permission User
         
     }
         else
     {
         
         if($CredSet -eq $True -and $Credentials -ne $null){
+            
+            
         Clear-Content C:\Users\$($env:USERNAME)\AppData\Local\clink\.history
-         $Settings_LB.Items.Add("$(GD)   CMD successfully started as Admin.")
+         $Output_LB.Items.Add("$(GD)   PowerShell successfully started as Admin.")
          $Process = Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\WindowsPowerShell\v1.0\\PowerShell.exe -verb runAs}" -WorkingDirectory $env:windir -PassThru -Wait
         
-        $Process.WaitForExit()
+         $Process.WaitForExit()
          if($UN -eq $null)
             {
             $user = $env:USERNAME
-            $history = Get-Content  C:\Users\$($user)\AppData\Local\clink\.history
-            Set-Variable -Name CMDHistory -Value $history -Scope global
+            $history = Get-Content  C:\Users\$($user)\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+            Set-Variable -Name PSHistory -Value $history -Scope global
             }
         else
             {
             $user = $UN
-            $history = Get-Content  C:\Users\$($user)\AppData\Local\clink\.history
-            Set-Variable -Name CMDHistory -Value $history -Scope global
+            $history = Get-Content  C:\Users\$($user)\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+            Set-Variable -Name PSHistory -Value $history -Scope global
             }
-            CMD-Log -Permission Admin
+            $Process.WaitForExit()
+            PS-Log -Permission Admin
         }else{
         [System.Windows.Forms.MessageBox]::Show('Credntials not set!', 'Error', 'Ok', 'Error')
-         $Settings_LB.Items.Add("$(GD)   CMD couldn't be started.")
+         $Output_LB.Items.Add("$(GD)   PowerShell couldn't be started.")
         }
         
     }
 })
 $AD_BT.Add_Click({
+    
+    
     $cmd="$env:windir\system32\rundll32.exe"
     $param="dsquery.dll,OpenQueryWindow"
     Start-Process $cmd $param
-$Settings_LB.Items.Add("$(GD)   Active Directory query successfully started.")
+$Output_LB.Items.Add("$(GD)   Active Directory query successfully started.")
 })
 $SM_BT.Add_Click({
     if($asAdmin_CB.Checked -eq $true)
@@ -1116,25 +1177,28 @@ $SM_BT.Add_Click({
     {
         $Check = $false
     }
-    if($Check -eq $True)
+    if($Check -eq $false)
     {
         if($CredSet -eq $True -and $Credentials -ne $null){
-
+            
+            
              Start-Process -WindowStyle Hidden "PowerShell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\ServerManager.exe -verb runas}"
-             $Settings_LB.Items.Add("$(GD)   Server Manager successfully started.")
+             $Output_LB.Items.Add("$(GD)   Server Manager successfully started.")
             
             }
             else
             {
+                
+                
                 Start-Process -WindowStyle Hidden "PowerShell.exe" -ArgumentList "-noprofile -command &{Start-Process C:\Windows\system32\ServerManager.exe}"
-                $Settings_LB.Items.Add("$(GD)   Server Manager successfully started.")
+                $Output_LB.Items.Add("$(GD)   Server Manager successfully started.")
             }
     }
 })
 $Credential_BT.Add_Click({
     if($UN -eq $null){$TempUN = $env:USERNAME}else{$TempUN = $UN}
-    $Settings_LB.items.Clear()
-     $Settings_LB.Items.Add("Current loged in User: $($TempUN)")
+    $Output_LB.items.Clear()
+     $Output_LB.Items.Add("Current loged in User: $($TempUN)")
     
     $CredSet = $null
     $UN = $null
@@ -1154,7 +1218,7 @@ $Credential_BT.Add_Click({
                 $UserName = $Cred.UserName
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
 
-                $Settings_LB.Items.Add("$(GD)    Current user switched to $UserName.")                
+                $Output_LB.Items.Add("$(GD)    Current user switched to $UserName.")                
             }
         }
         elseif($Mode_CB.Text -eq "Local")
@@ -1168,7 +1232,7 @@ $Credential_BT.Add_Click({
                 $UserName = $Cred.UserName
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
 
-                $Settings_LB.Items.Add("$(GD)   Current user switched to $UserName.")                
+                $Output_LB.Items.Add("$(GD)   Current user switched to $UserName.")                
             }            
         } 
     }	
@@ -1180,12 +1244,12 @@ $CLA_BT.Add_Click({
         if($ADMCheck -eq $True)
             {
             if($UN -eq $null){$Name = $env:username}else{$Name = $UN}
-            $Settings_LB.Items.Add("$(GD)   User $Name is in the Admin group.")
+            $Output_LB.Items.Add("$(GD)   User $Name is in the Admin group.")
             }
         else
             {
             if($UN -eq $null){$Name = $env:username}else{$Name = $UN}
-            $Settings_LB.Items.Add("$(GD)   User $Name is not in the Admin group.")
+            $Output_LB.Items.Add("$(GD)   User $Name is not in the Admin group.")
             }
     }
     else
@@ -1194,12 +1258,12 @@ $CLA_BT.Add_Click({
         if($ADMCheck -eq $True)
             {
             if($UN -eq $null){$Name = $env:username}else{$Name = $UN}
-            $Settings_LB.Items.Add("$(GD)   User $Name is in the Admin group.")
+            $Output_LB.Items.Add("$(GD)   User $Name is in the Admin group.")
             }
         else
             {
             if($UN -eq $null){$Name = $env:username}else{$Name = $UN}
-            $Settings_LB.Items.Add("$(GD)   User $Name is not in the Admin group.")
+            $Output_LB.Items.Add("$(GD)   User $Name is not in the Admin group.")
             } 
     }
 })
@@ -1212,15 +1276,17 @@ $OpenFile_BT.Add_Click({
     {
         $Check = $false
     }
-    if($Check -eq $True)
+    if($Check -eq $false)
     {
-        if($FilePath_TB.Text -ne $null)
+        if($FilePath_TB.Text -ne "")
         {
-            if(Test-Path -Path $FilePath_TB.Text)
+            if((Test-Path -Path $FilePath_TB.Text))
             {
+                
+                
                 Set-Variable -Name File -Value $FilePath_TB.Text -Scope global
-                Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process $($File.FileName) -verb runAs}" -WorkingDirectory $env:windir -PassThru
-                $Settings_LB.Items.Add("Programm successfully started as Admin $(GD)")
+                Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process $($File.FileName)}" -WorkingDirectory $env:windir -PassThru
+                $Output_LB.Items.Add("$(GD)   Programm successfully started as Admin.")
                 File-Log -Permission Admin
 
             }
@@ -1229,7 +1295,7 @@ $OpenFile_BT.Add_Click({
                 [System.Windows.Forms.MessageBox]::Show('Path is invalid.', 'Error', 'Ok', 'Error')
             }
         }
-        elseif($FilePath_TB.Text -eq $null)
+        elseif($FilePath_TB.Text -eq "")
         {
             $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog 
             $OpenFileDialog.initialDirectory = $initialDirectory
@@ -1238,21 +1304,24 @@ $OpenFile_BT.Add_Click({
             $OpenFileDialog.ShowDialog() | Out-Null 
             $OpenFileDialog.filename 
             Set-Variable -Name File -Value $OpenFileDialog -Scope global
-
-            Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process $($File.FileName) -verb runAs}" -WorkingDirectory $env:windir -PassThru
-            $Settings_LB.Items.Add("Programm successfully started as Admin $(GD)")
+            
+            
+            Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -ArgumentList "-noprofile -command &{Start-Process $($File.FileName)}" -WorkingDirectory $env:windir -PassThru
+            $Output_LB.Items.Add("$(GD)   Programm successfully started as Admin.")
             File-Log -Permission User  
         }
     }
     else
     {
-        if($FilePath_TB.Text -ne $null)
+        if($FilePath_TB.Text -ne "")
         {
-            if(Test-Path -Path $FilePath_TB.Text)
+            if((Test-Path -Path $FilePath_TB.Text))
             {
+                
+                
                 Set-Variable -Name File -Value $FilePath_TB.Text -Scope global
                 Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process $($File.FileName)}" -WorkingDirectory $env:windir -PassThru
-                $Settings_LB.Items.Add("Programm successfully started as Admin $(GD)")
+                $Output_LB.Items.Add("$(GD)   Programm successfully started as Admin.")
                 File-Log -Permission Admin
 
             }
@@ -1261,7 +1330,7 @@ $OpenFile_BT.Add_Click({
                 [System.Windows.Forms.MessageBox]::Show('Path is invalid.', 'Error', 'Ok', 'Error')    
             }
         }
-        elseif($FilePath_TB.Text -eq $null)
+        elseif($FilePath_TB.Text -eq "")
         {
             $OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog 
             $OpenFileDialog.initialDirectory = $initialDirectory
@@ -1270,9 +1339,10 @@ $OpenFile_BT.Add_Click({
             $OpenFileDialog.ShowDialog() | Out-Null 
             $OpenFileDialog.filename 
             Set-Variable -Name File -Value $OpenFileDialog -Scope global
-
+            
+            
             Start-Process -WindowStyle Hidden -FilePath "powershell.exe" -Credential $Credentials -ArgumentList "-noprofile -command &{Start-Process $($File.FileName)}" -WorkingDirectory $env:windir -PassThru
-            $Settings_LB.Items.Add("Programm successfully started as Admin $(GD)")
+            $Output_LB.Items.Add("$(GD)   Programm successfully started as Admin.")
             File-Log -Permission User  
         }  
     }
