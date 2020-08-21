@@ -6,21 +6,31 @@ Here Comes my Tool enters the game. You may use an uprevileged account but you c
 Many thanks to Berend and his script(https://gallery.technet.microsoft.com/scriptcenter/PowerShell-Script-410ef9df) i used to encrypt and decrypt settings so noone can change them, or if changed the program will be brocken, but yout at least know who broke it ^-^.
 
 # Setup #
-
+There is a setup.exe which will create directories aswell as config files. Don't move the exe, make a shortcut, the exe is bound to its initial location because it need its config files.
 ## Requiments ##
+There is some needed ass well as optional software that needs to be installed for the application in order to work properly.
 
+So what do we need?
+- PSReadLine which is mostly already installed on new hosts if i remember right iits installed at PowerShell 5.0 upwards. We need it for advanced PS logging.
+- Clink for CMD. Is needed becasue the normal CMD doesent have any kind of persistent history. Once closed its gone.
+- Chocolatey, we need it in order to be able to install Clink.
+- The Acrive Directory Module for PowerShell. You might need it if you have a domain joined host and then you can provide AD or local credentails, else its only allowed to use local credentails. We need it to check if your in the admin group, the Domain admin group you enter in the settings part or in  the  local Adminostrators group.
 ### Install ###
-
+Execute setup.exe and watch it running, no im making jokes, you might need to enter some infos as well as decide to install optional software.
 ### Uninstall ###
-
+Execute uninstall.exe and the tool will destroy itself.
 # Usage #
 
 ### Login ###
 ![Login GUI](https://github.com/seyo-IV/PowerShell-Security-App/blob/master/images/Login.PNG)
+
+Obivious its a login screen. Default login credentails are (Warning its case sensitive!) username/password for the normal user and admin/admin for admin.
 ### Operations ###
 ![Operations GUI](https://github.com/seyo-IV/PowerShell-Security-App/blob/master/images/Operations.PNG)
 ### Output ###
 ![Output GUI](https://github.com/seyo-IV/PowerShell-Security-App/blob/master/images/Output.PNG)
+
+Here lands the output of your usage of the tools. But you can also load the logs of the current day/session.
 ## Admin area ##
 ### Settings ###
 ![Settings GUI](https://github.com/seyo-IV/PowerShell-Security-App/blob/master/images/Settings.PNG)
