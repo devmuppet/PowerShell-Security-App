@@ -28,7 +28,7 @@ Obivious its a login screen. Default login credentails are (Warning its case sen
 ### Operations ###
 ![Operations GUI](https://github.com/seyo-IV/PowerShell-Security-App/blob/master/images/Operations.PNG)
 
-- We got here PowerShell, CMD and the Server Manager which can all be started with the "as Admin" Checkbox to be started ass admin but this only works if you are an admin or you provide AD or Local Admin credentails. Active Directory is onl the query function where you can search for ad-objects but you cant alter them.
+- We got here PowerShell, CMD and the Server Manager which can all be started with the "as Admin" checkbox to be started as admin but this only works if you are an admin or you provide AD or Local Admin credentails. Active Directory is only the query function where you can search for ad-objects but you cant alter them.
 - As mentioned above you can provide credentail so the tools or applications are initialized with elevated rights. Credentails can be either local or domain. Youe the combobox for that.
 - With "Open" you can either open the file with a file dialog or you can type the path to the application yourself.
 - With "Check Local Admin" you can check if the provided credentaisl are those of an admin or if the login user is an admin yourself.
