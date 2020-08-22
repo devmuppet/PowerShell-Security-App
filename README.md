@@ -27,6 +27,11 @@ Execute uninstall.exe and the tool will destroy itself.
 Obivious its a login screen. Default login credentails are (Warning its case sensitive!) username/password for the normal user and admin/admin for admin.
 ### Operations ###
 ![Operations GUI](https://github.com/seyo-IV/PowerShell-Security-App/blob/master/images/Operations.PNG)
+
+- We got here PowerShell, CMD and the Server Manager which can all be started with the "as Admin" Checkbox to be started ass admin but this only works if you are an admin or you provide AD or Local Admin credentails. Active Directory is onl the query function where you can search for ad-objects but you cant alter them.
+- As mentioned above you can provide credentail so the tools or applications are initialized with elevated rights. Credentails can be either local or domain. Youe the combobox for that.
+- With "Open" you can either open the file with a file dialog or you can type the path to the application yourself.
+- With "Check Local Admin" you can check if the provided credentaisl are those of an admin or if the login user is an admin yourself.
 ### Output ###
 ![Output GUI](https://github.com/seyo-IV/PowerShell-Security-App/blob/master/images/Output.PNG)
 
@@ -34,3 +39,9 @@ Here lands the output of your usage of the tools. But you can also load the logs
 ## Admin area ##
 ### Settings ###
 ![Settings GUI](https://github.com/seyo-IV/PowerShell-Security-App/blob/master/images/Settings.PNG)
+
+This are is reserved for admin only. So provide admin credentails on login you can access it.
+
+For security reasons i decided to hash the settings so noone can just read the ini and change username/password. The settings are set all at once but if you leave a textbox blank the old value is taken. After setting the settings you need to restart the App.
+
+To see the current locaded settings press "Get-Values".
