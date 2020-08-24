@@ -4,17 +4,18 @@ $LogDate = Get-Date -format ddMMyyyy
 $Passphrase=""
 $SaltCrypto=""
 $INITPW=""
+[string]$Root = Split-Path -Parent -Path ([Environment]::GetCommandLineArgs()[0])
 
 ## endregion Global Vars
 
 ## Functions
 Function Get-SettingsINI {
-    $SettingsINI = Get-Content "$PSScriptRoot\_data\settings.ini"
+    $SettingsINI = Get-Content "$Root\_data\settings.ini"
     return $SettingsINI 
 }
 
 Function Get-CredentialINI {
-    $CredentialINI = Get-Content "$PSScriptRoot\_data\Credential.ini"
+    $CredentialINI = Get-Content "$Root\_data\Credential.ini"
     return $CredentialINI
 }
 
@@ -360,13 +361,13 @@ function Decrypt-Credential {
     Set-Variable -Name DecSPass -Value $SPassword -Scope Global
 }
 Function Write-Settings {
-    Clear-Content -Path "$PSScriptRoot\_data\settings.ini"
+    Clear-Content -Path "$Root\_data\settings.ini"
     $ContentSettings = @("[Settings]", "SettingSet=1", "[Admin Settings]", "DomainAdminGroup=$EncDomainADminGroupSet", "[Log Path]", "LogPath=$EncLogPathSet")
-    Set-Content -Path "$PSScriptRoot\_data\settings.ini" -Value $ContentSettings
+    Set-Content -Path "$Root\_data\settings.ini" -Value $ContentSettings
 
-    Clear-Content -Path "$PSScriptRoot\_data\Credential.ini"
+    Clear-Content -Path "$Root\_data\Credential.ini"
     $ContentCredntail = @("[ADM]", "ADMUsername=$EncADMUserSet", "ADMPassword=$EncADMPassSet", "[Standard User]", "Username=$EncSUserSet", "Password=$EncSPassSet")
-    Set-Content -Path "$PSScriptRoot\_data\Credential.ini" -Value $ContentCredntail
+    Set-Content -Path "$Root\_data\Credential.ini" -Value $ContentCredntail
 }
 Function Read-Settings {
     $Settings_LB.Items.Add("[settings.ini]")
