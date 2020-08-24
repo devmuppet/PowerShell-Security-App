@@ -1,15 +1,18 @@
 $host.UI.RawUI.WindowTitle = "Security-App Setup"
 
+[string]$Root = Split-Path -Parent -Path ([Environment]::GetCommandLineArgs()[0])
+
+
 Write-Host -ForegroundColor Yellow "[INFO] `t Creating direcories."
-New-item -ItemType Directory -Path $PSScriptRoot -Name "_code"
-New-item -ItemType Directory -Path $PSScriptRoot -Name "_data"
+New-item -ItemType Directory -Path $Root -Name "_code"
+New-item -ItemType Directory -Path $Root -Name "_data"
 Write-Host -ForegroundColor Yellow "[OK] `t Done creating direcories."
 "`n"
 Write-Host -ForegroundColor Yellow "[INFO] `t Creating config files."
 $settingsINI = @("[Settings]","SettingSet=0","[Admin Settings]","DomainAdminGroup=","[Log Path]","LogPath=")
 $credentailINI = @("[ADM]","ADMUsername=","ADMPassword=","[Standard User]","Username=","Password=")
-Set-Content -Path "$PSScriptRoot\_data\settings.ini" -Value $settingsINI
-Set-Content -Path "$PSScriptRoot\_data\credentail.ini" -Value $credentailINI
+Set-Content -Path "$Root\_data\settings.ini" -Value $settingsINI
+Set-Content -Path "$Root\_data\credentail.ini" -Value $credentailINI
 Write-Host -ForegroundColor Yellow "[OK] `t Done creating configs."
 "`n"
 ## pre requiments Block
@@ -23,7 +26,7 @@ $preRequiments = @'
     $pAddress = Read-Host "Proxy Address"
     $pPort = Read-Host "Proxy Port"
     Write-Host -ForegroundColor Yellow "[INFO] `t Creating config."
-    $parentPath = (get-item $PSScriptRoot).parent.FullName
+    $parentPath = (get-item $Root).parent.FullName
     $pAddress | Out-File $parentPath\_data\proxy.conf
     $pPort | Out-File $parentPath\_data\proxy.conf -Append
     Write-Host -ForegroundColor Green "[OK] `t Done creating config."
@@ -62,10 +65,10 @@ Function Check-PS-RL {
     
     if((Check-PS-RL) -eq $False)
         {
-            $parentPath = (get-item $PSScriptRoot).parent.FullName 
+            $parentPath = (get-item $Root).parent.FullName 
             if(Test-Path -Path "$parentPath\_data\proxy.conf")
             {
-                $proxy = Get-Content $PSScriptRoot\proxy.conf
+                $proxy = Get-Content $Root\proxy.conf
                 $pAddress= $proxy[0]
                 $pPort = $proxy[1]
                 ## setup Proxy
@@ -121,33 +124,33 @@ choco install clink -y
 '@
 
 ## Set content of files
-Set-Content -Path "$PSScriptRoot\_code\preRequimentsS.ps1" -Value $preRequiments -Encoding utf8BOM
-Set-Content -Path "$PSScriptRoot\_code\setupPS.ps1" -Value $setupPS -Encoding utf8BOM
-Set-Content -Path "$PSScriptRoot\_code\setupAD.ps1" -Value $setupAD -Encoding utf8BOM
-Set-Content -Path "$PSScriptRoot\_code\setupCMD.ps1" -Value $setupCMD -Encoding utf8BOM
+Set-Content -Path "$Root\_code\preRequimentsS.ps1" -Value $preRequiments -Encoding utf8BOM
+Set-Content -Path "$Root\_code\setupPS.ps1" -Value $setupPS -Encoding utf8BOM
+Set-Content -Path "$Root\_code\setupAD.ps1" -Value $setupAD -Encoding utf8BOM
+Set-Content -Path "$Root\_code\setupCMD.ps1" -Value $setupCMD -Encoding utf8BOM
 
 try{
     $testchoco = Test-Path -Path C:\ProgramData\chocolatey
     if(!$testchoco){
     Write-Host -ForegroundColor Yellow "[INFO] `t Starting Chocolatey setup."
-    Powershell.exe -noprofile -File "$PSScriptRoot\_code\preRequiments.ps1"
+    Powershell.exe -noprofile -File "$Root\_code\preRequiments.ps1"
     Write-Host -ForegroundColor Green "[OK] `t Chocolatey installed"
     }
     "`n"
     Write-Host -ForegroundColor Yellow "[INFO] `t Starting PowerShell setup."
-    Powershell.exe -noprofile -File "$PSScriptRoot\_code\SetupPS.ps1"
+    Powershell.exe -noprofile -File "$Root\_code\SetupPS.ps1"
     Write-Host -ForegroundColor Green "[OK] `t Setup of PowerShell is complete."
     "`n"
     Write-Host -ForegroundColor Yellow "[INFO] `t Starting Acttive Directory setup."
-    Powershell.exe -noprofile -File "$PSScriptRoot\_code\SetupAD.ps1"
+    Powershell.exe -noprofile -File "$Root\_code\SetupAD.ps1"
     Write-Host -ForegroundColor Green "[OK] `t Setup of Active Directory is complete."
     "`n"
     Write-Host -ForegroundColor Yellow "[INFO] `t Starting CMD setup."
-    Start-Process cmd.exe -argumentList 'cmd.exe /c "$PSScriptRoot\_code\SetupCMD.Bat"' -Wait -PassThru -NoNewWindow
+    Start-Process cmd.exe -argumentList 'cmd.exe /c "$Root\_code\SetupCMD.Bat"' -Wait -PassThru -NoNewWindow
     Start-Sleep -sec 3
     Start-Process cmd.exe -argumentList '/c exit' -Wait -PassThru -NoNewWindow
     $User = $env:UserName
-    $parentPath = (get-item $PSScriptRoot).parent.FullName
+    $parentPath = (get-item $Root).parent.FullName
     Copy-Item -Path "$parentPath\0_data\settings" -Destination "C:\Users\$user\AppData\Local\clink"
     Start-Sleep -sec 3
     $prevContennt = Get-Content "C:\Users\$user\AppData\Local\clink"
@@ -157,7 +160,12 @@ try{
 }catch{$_.Exception.Message}
 ## Cleanup
 Start-Sleep -Seconds 2
-Remove-item -Path "$PSScriptRoot\_code\preRequiments.ps1"
-Remove-item -Path "$PSScriptRoot\_code\SetupAD.ps1"
-Remove-item -Path "$PSScriptRoot\_code\SetupCMD.Bat"
-Remove-item -Path "$PSScriptRoot\_code\SetupPS.ps1"
+Write-Host -ForegroundColor Yellow "[INFO] `t Starting cleanup."
+Remove-item -Path "$Root\_code\preRequiments.ps1"
+Remove-item -Path "$Root\_code\SetupAD.ps1"
+Remove-item -Path "$Root\_code\SetupCMD.Bat"
+Remove-item -Path "$Root\_code\SetupPS.ps1"
+Write-Host -ForegroundColor Green "[OK] `t Cleanup complete."
+
+Write-Output -InputObject "Press any key to continue..."
+[void]$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
