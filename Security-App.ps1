@@ -1,9 +1,9 @@
 $LogDate = Get-Date -format ddMMyyyy
 
 ## Global Vars
-$Passphrase=""
-$SaltCrypto=""
-$INITPW=""
+$Passphrase="" ## 12-16 digit long string
+$SaltCrypto="" ## 8 digit long string
+$INITPW="" ## 8 digit long string
 [string]$Root = Split-Path -Parent -Path ([Environment]::GetCommandLineArgs()[0])
 
 ## endregion Global Vars
