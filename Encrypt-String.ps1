@@ -1,6 +1,6 @@
 $String = Read-Host "String"
 $Passphrase = Read-Host "Passphrase"
-$SaltCrypto = Read-Host "Slat"
+$SaltCrypto = Read-Host "Salt"
 $INITPW = Read-Host "Init"
 function Encrypt-String($String=$string, $Passphrase=$Passphrase, $salt=$SaltCrypto, $init=$INITPW, [switch]$arrayOutput) 
 { 
