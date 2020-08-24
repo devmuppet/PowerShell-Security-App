@@ -6,8 +6,8 @@ New-item -ItemType Directory -Path $PSScriptRoot -Name "_data"
 Write-Host -ForegroundColor Yellow "[OK] `t Done creating direcories."
 "`n"
 Write-Host -ForegroundColor Yellow "[INFO] `t Creating config files."
-$settingsINI = @("[Settings]","SettingSet=0","[Admin Settings]","DomainAdminGroup=UoO/0Do4t96SGbUpgMqB8w==","[Log Path]","LogPath=vGFgscE8CRCXYqC4+Cp3WQ==")
-$credentailINI = @("[ADM]","ADMUsername=tMqniQcteZlNkxYQ++MApQ==","ADMPassword=tMqniQcteZlNkxYQ++MApQ==","[Standard User]","Username=a9NYndtdxI3149R19HS1xA==","Password=PTy/K/fLjtK9biwekjdDYg==")
+$settingsINI = @("[Settings]","SettingSet=0","[Admin Settings]","DomainAdminGroup=","[Log Path]","LogPath=")
+$credentailINI = @("[ADM]","ADMUsername=","ADMPassword=","[Standard User]","Username=","Password=")
 Set-Content -Path "$PSScriptRoot\_data\settings.ini" -Value $settingsINI
 Set-Content -Path "$PSScriptRoot\_data\credentail.ini" -Value $credentailINI
 Write-Host -ForegroundColor Yellow "[OK] `t Done creating configs."
