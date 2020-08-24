@@ -1,6 +1,6 @@
 $Encrypted = Read-Host "String"
 $Passphrase = Read-Host "Passphrase"
-$SaltCrypto = Read-Host "Slat"
+$SaltCrypto = Read-Host "Salt"
 $INITPW = Read-Host "Init"
 
 function Decrypt-String($Encrypted=$Encrypted, $Passphrase=$Passphrase, $salt=$SaltCrypto, $init=$INITPW) 
