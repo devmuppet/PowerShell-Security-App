@@ -5,6 +5,8 @@ Here my Tool enters the game. You may use an uprevileged account but you can all
 
 Many thanks to Berend and his script(https://gallery.technet.microsoft.com/scriptcenter/PowerShell-Script-410ef9df) i used to encrypt and decrypt settings so noone can change them, or if changed the program will be brocken, but yout at least know who broke it ^-^.
 
+# Conclusion #
+Havent tested the new install/Setup and uninstall scripts yet. Feel Free to test, edit and improve.
 # Setup #
 There is a setup.exe which will create directories aswell as config files. Don't move the exe, the exe is bound to its initial location because it need its config files.
 
