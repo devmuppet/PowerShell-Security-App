@@ -7,8 +7,30 @@ $INITPW=""
 
 ## endregion Global Vars
 
-## Functions
 
+## Functions
+Function Check-PS-AD {
+    $Modules = (Get-Module -ListAvailable).Name
+    if($Modules -contains "ActiveDirecotry")
+    {
+        return $true
+    }
+    else
+    {
+        return $false
+    }
+}
+Function Check-AD {
+    if($(Check-PS-AD))
+    {
+        Import-Module ActiveDirecotry
+        $Output_LB.Items.Add("$(GD)   Active Directory module is present and loaded")
+    }
+    else
+    {
+        $Output_LB.Items.Add("$(GD)   Active Directory module not found.")
+    }
+}
 Function Get-SettingsINI {
     $SettingsINI = Get-Content "$PSScriptRoot\_data\settings.ini"
     return $SettingsINI 
@@ -255,7 +277,7 @@ Function Get-CredentialFromIni {
 
 Function Encrypt-Setting-ADMGroup {
 
-    if($ADMGroup_TB.Text -ne $null)
+    if($ADMGroup_TB.Text -ne "")
     {
         $DomainAdminGroup=Encrypt-String $ADMGroup_TB.Text
         Set-Variable -Name EncDomainADminGroupSet -Value $DomainAdminGroup
@@ -267,7 +289,7 @@ Function Encrypt-Setting-ADMGroup {
 }
 Function Encrypt-Setting-LogPath {
 
-    if($LogPath_TB.Text -ne $null)
+    if($LogPath_TB.Text -ne "")
     {
         $LogPath=Encrypt-String $LogPath_TB.Text
         Set-Variable -Name EncLogPath -Value $LogPath
@@ -279,7 +301,7 @@ Function Encrypt-Setting-LogPath {
 }
 Function Encrypt-Setting-ADMUserName {
 
-    if($ADMUserName_TB.Text -ne $null)
+    if($ADMUserName_TB.Text -ne "")
     {
         $ADMUsername=Encrypt-String $ADMUserName_TB.Text
         Set-Variable -Name EncADMUserSet -Value $ADMUsername
@@ -291,7 +313,7 @@ Function Encrypt-Setting-ADMUserName {
 }
 Function Encrypt-Setting-ADMPassword {
 
-    if($ADMPassword_TB.Text -ne $null)
+    if($ADMPassword_TB.Text -ne "")
     {
         $ADMPassword=Encrypt-String $ADMPassword_TB.Text
         Set-Variable -Name EncADMPassSet -Value $ADMPassword
@@ -303,7 +325,7 @@ Function Encrypt-Setting-ADMPassword {
 }
 Function Encrypt-Setting-SUserName {
 
-    if($SUserName_TB.Text -ne $null)
+    if($SUserName_TB.Text -ne "")
     {
         $SUername=Encrypt-String $SUserName_TB.Text
         Set-Variable -Name EncSUserSet -Value $SUsername
@@ -314,7 +336,7 @@ Function Encrypt-Setting-SUserName {
     }
 }
 Function Encrypt-Setting-SPassword {
-    if($SPassword_TB.Text -ne $null)
+    if($SPassword_TB.Text -ne "")
     {
         $SPassword=Encrypt-String $SPassword_TB.Text
         Set-Variable -Name EncSPassSet -Value $SPassword
@@ -402,7 +424,7 @@ Function Load-File-Log{
 Add-Type -AssemblyName PresentationCore, PresentationFramework, System.Windows.Forms
 
 $XamlLogin = @"
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="600" Height="400" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Background="#35333a" BorderThickness="0" BorderBrush="#666374" Foreground="#514e5d" OpacityMask="#5b586d" Name="LoginPageWPF" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Title="Login Security-Tool" WindowChrome.IsHitTestVisibleInChrome="True">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="600" Height="400" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Background="#35333a" BorderThickness="0" BorderBrush="#666374" Foreground="#514e5d" OpacityMask="#5b586d" Name="LoginPageWPF" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Title="Login Security-App" WindowChrome.IsHitTestVisibleInChrome="True">
 	<Grid Background="#262335" ShowGridLines="False" Name="MainGrid">
 		<TabControl Name="TabNav" SelectedIndex="0" Padding="-1">
 			<TabItem Name="LoginTab" Header="Tab 1" Visibility="Collapsed">
@@ -459,7 +481,7 @@ if($AdminLogin -eq $true)
     
 ## Form Admin
 $XamlAdmin = @"
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="700" Height="600" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Background="#35333a" BorderThickness="0" BorderBrush="#666374" Foreground="#514e5d" OpacityMask="#5b586d" Name="TestWPF1" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Title="Security-Tool User" WindowChrome.IsHitTestVisibleInChrome="True">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="700" Height="600" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Background="#35333a" BorderThickness="0" BorderBrush="#666374" Foreground="#514e5d" OpacityMask="#5b586d" Name="TestWPF1" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Title="Security-App Admin" WindowChrome.IsHitTestVisibleInChrome="True">
 	<Grid Background="#262335" ShowGridLines="False" Name="MainGrid">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="24"/>
@@ -496,9 +518,8 @@ $XamlAdmin = @"
 				<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Close" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="198,406,0,0" Name="Close_BT"/>
 				<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Check Local Admin" HorizontalAlignment="Left" VerticalAlignment="Top" Width="130" Margin="330,281,0,0" Name="CLA_BT"/>
 				<TextBox Background="#171520" Foreground="#ffffff" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="23" Width="300" TextWrapping="Wrap" Margin="94,229,0,0" Name="FilePath_TB"/>
-                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="180,485,0,0" Name="Cleear_BT"/>
-                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Load Log" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="260,485,0,0" Name="Load_BT"/>
-				
+                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Open" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="428,229,0,0" Name="OpenFile_BT"/>
+
 				<ComboBox Background="#ffffff" Foreground="#171520" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="95,281,0,0" Name="Mode_CB"/>
 				</Grid>
 			</TabItem>
@@ -507,8 +528,9 @@ $XamlAdmin = @"
 				<Grid Background="#262335">
 					<TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Text="Output" FontSize="14" FontWeight="Bold" Height="21" Foreground="#ffffff"/>
 					<ListBox Foreground="#ffffff" Background="#000000" HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="0" Height="400" VerticalAlignment="Top" Width="500" Margin="25,70,0,0" Name="Output_LB"/>
-					<Button FontSize="20" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="240,485,0,0" Name="Cleear_BT"/>
-				</Grid>
+					<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="180,485,0,0" Name="ClearOutput_BT"/>
+                    <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Get-Log" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="260,485,0,0" Name="LoadLog_BT"/>
+                </Grid>
 			</TabItem>
 
 			<TabItem Header="Settings" Visibility="Collapsed" Name="Tab3">
@@ -527,8 +549,7 @@ $XamlAdmin = @"
   					<TextBlock Foreground="#ffffff" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="Wrap" Text="Admin Password" Margin="275,293,0,0"/>
 					<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Get-Values" Name="Values_BT" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="267,405,0,0"/>
 					<TextBlock Foreground="#ffffff" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="Wrap" Text="LogPath" Name="LogPath_TB" Margin="110,41,0,0"/>
-					<TextBox Background="#171520" Foreground="#ffffff" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="23" Width="230" TextWrapping="Wrap" Margin="20,60,0,0"/>
-
+					<TextBox Background="#171520" Foreground="#ffffff" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="23" Width="230" TextWrapping="Wrap" Margin="20,60,0,0"/>    
 					<ListBox Foreground="#ffffff" Background="#000000" HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="1" Height="170" VerticalAlignment="Top" Width="268" Margin="253,60,0,0" Name="Settings_LB"/>
 					  
 				</Grid>
@@ -561,7 +582,11 @@ $Tab1BT.Add_Click({Tab1Click $this $_})
 $Tab2BT.Add_Click({Tab2Click $this $_})
 $Tab3BT.Add_Click({Tab3Click $this $_})
 ## Buttons
-$Load_BT.Add_Click({
+$ClearOutput_BT.Add_Click({
+    $Output_LB.Items.Clear()
+})
+
+$LoadLog_BT.Add_Click({
     $PSLog=Load-PS-Log
     $CMDLog=Load-CMD-Log
     $FileLog=Load-File-Log
@@ -899,7 +924,7 @@ $OpenFile_BT.Add_Click({
     }
 })
 $Close_BT.Add_Click({
-	$WindowUser.close()
+	$WindowAdmin.close()
 })
 $Go_BT.Add_Click({
     Encrypt-Setting-ADMGroup
@@ -934,7 +959,7 @@ elseif($AdminLogin -eq $false)
 {
 ## Form User
 $XamlUser = @"
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="700" Height="600" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Background="#35333a" BorderThickness="0" BorderBrush="#666374" Foreground="#514e5d" OpacityMask="#5b586d" Name="TestWPF1" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Title="Security-Tool User" WindowChrome.IsHitTestVisibleInChrome="True">
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Width="700" Height="600" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,0,0" Background="#35333a" BorderThickness="0" BorderBrush="#666374" Foreground="#514e5d" OpacityMask="#5b586d" Name="TestWPF1" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Title="Security-App User" WindowChrome.IsHitTestVisibleInChrome="True">
 	<Grid Background="#262335" ShowGridLines="False" Name="MainGrid">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="24"/>
@@ -980,8 +1005,8 @@ $XamlUser = @"
 				<Grid Background="#262335">
 				<TextBlock HorizontalAlignment="Center" VerticalAlignment="Top" TextWrapping="Wrap" Text="Output" FontSize="14" FontWeight="Bold" Height="21" Foreground="#ffffff"/>
 				<ListBox Foreground="#ffffff" Background="#000000" HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="0" Height="400" VerticalAlignment="Top" Width="500" Margin="25,70,0,0" Name="Output_LB"/>
-                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="180,485,0,0" Name="Cleear_BT"/>
-                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Load Log" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="260,485,0,0" Name="Load_BT"/>
+                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Clear" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="180,485,0,0" Name="ClearOutput_BT"/>
+                <Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Get-Log" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="260,485,0,0" Name="LoadLog_BT"/>
 				</Grid>
 			</TabItem>
 
@@ -1008,7 +1033,10 @@ $xmlUser.SelectNodes("//*[@Name]") | ForEach-Object { Set-Variable -Name $_.Name
 $Tab1BT.Add_Click({Tab1Click $this $_})
 $Tab2BT.Add_Click({Tab2Click $this $_})
 ## Buttons
-$Load_BT.Add_Click({
+$ClearOutput_BT.Add_Click({
+    $Output_LB.Items.Clear()
+})
+$LoadLog_BT.Add_Click({
     $PSLog=Load-PS-Log
     $CMDLog=Load-CMD-Log
     $FileLog=Load-File-Log
