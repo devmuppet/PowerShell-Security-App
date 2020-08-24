@@ -9,28 +9,6 @@ $INITPW=""
 
 
 ## Functions
-Function Check-PS-AD {
-    $Modules = (Get-Module -ListAvailable).Name
-    if($Modules -contains "ActiveDirecotry")
-    {
-        return $true
-    }
-    else
-    {
-        return $false
-    }
-}
-Function Check-AD {
-    if($(Check-PS-AD))
-    {
-        Import-Module ActiveDirecotry
-        $Output_LB.Items.Add("$(GD)   Active Directory module is present and loaded")
-    }
-    else
-    {
-        $Output_LB.Items.Add("$(GD)   Active Directory module not found.")
-    }
-}
 Function Get-SettingsINI {
     $SettingsINI = Get-Content "$PSScriptRoot\_data\settings.ini"
     return $SettingsINI 
@@ -280,11 +258,12 @@ Function Encrypt-Setting-ADMGroup {
     if($ADMGroup_TB.Text -ne "")
     {
         $DomainAdminGroup=Encrypt-String $ADMGroup_TB.Text
-        Set-Variable -Name EncDomainADminGroupSet -Value $DomainAdminGroup
+        Set-Variable -Name EncDomainADminGroupSet -Value $DomainAdminGroup -Scope Global
     }
     else
     {
-        Set-Variable -Name EncDomainADminGroupSet -Value $EncLogPath
+        $Group = $EncDomainADminGroup -replace "DomainAdminGroup=", ""
+        Set-Variable -Name EncDomainADminGroupSet -Value $Group -Scope Global
     }
 }
 Function Encrypt-Setting-LogPath {
@@ -292,11 +271,12 @@ Function Encrypt-Setting-LogPath {
     if($LogPath_TB.Text -ne "")
     {
         $LogPath=Encrypt-String $LogPath_TB.Text
-        Set-Variable -Name EncLogPath -Value $LogPath
+        Set-Variable -Name EncLogPathSet -Value $LogPath -Scope Global
     }
     else
     {
-        Set-Variable -Name EncLogPathSet -Value $EncLogPath
+        $Log = $EncLogPath -replace "LogPath=", ""
+        Set-Variable -Name EncLogPathSet -Value $Log -Scope Global
     }
 }
 Function Encrypt-Setting-ADMUserName {
@@ -304,11 +284,12 @@ Function Encrypt-Setting-ADMUserName {
     if($ADMUserName_TB.Text -ne "")
     {
         $ADMUsername=Encrypt-String $ADMUserName_TB.Text
-        Set-Variable -Name EncADMUserSet -Value $ADMUsername
+        Set-Variable -Name EncADMUserSet -Value $ADMUsername -Scope Global
     }
     else
     {
-        Set-Variable -Name EncADMUserSet -Value $EncADMUser
+        $Username = $EncADMUser -replace "ADMUsername=", ""
+        Set-Variable -Name EncADMUserSet -Value $Username -Scope Global
     }
 }
 Function Encrypt-Setting-ADMPassword {
@@ -316,34 +297,37 @@ Function Encrypt-Setting-ADMPassword {
     if($ADMPassword_TB.Text -ne "")
     {
         $ADMPassword=Encrypt-String $ADMPassword_TB.Text
-        Set-Variable -Name EncADMPassSet -Value $ADMPassword
+        Set-Variable -Name EncADMPassSet -Value $ADMPassword -Scope Global
     }
     else
     {
-        Set-Variable -Name EncADMPassSet -Value $EncADMPass
+        $Password = $EncADMPass -replace "ADMPassword=", ""
+        Set-Variable -Name EncADMPassSet -Value $Password -Scope Global
     }
 }
 Function Encrypt-Setting-SUserName {
 
     if($SUserName_TB.Text -ne "")
     {
-        $SUername=Encrypt-String $SUserName_TB.Text
-        Set-Variable -Name EncSUserSet -Value $SUsername
+        $SUsername=Encrypt-String $SUserName_TB.Text
+        Set-Variable -Name EncSUserSet -Value $SUsername -Scope Global
     }
     else
     {
-        Set-Variable -Name EncSUserSet -Value $EncSUser
+        $Username = $EncSUser -replace "Username=", ""
+        Set-Variable -Name EncSUserSet -Value $Username -Scope Global
     }
 }
 Function Encrypt-Setting-SPassword {
     if($SPassword_TB.Text -ne "")
     {
         $SPassword=Encrypt-String $SPassword_TB.Text
-        Set-Variable -Name EncSPassSet -Value $SPassword
+        Set-Variable -Name EncSPassSet -Value $SPassword -Scope Global
     }
     else
     {
-        Set-Variable -Name EncSPassSet -Value $EncSPass
+        $Password = $EncSPass -replace "Password=", ""
+        Set-Variable -Name EncSPassSet -Value $Password -Scope Global
     }
 }
 Function Decrypt-Settings {
@@ -377,9 +361,12 @@ function Decrypt-Credential {
     Set-Variable -Name DecSPass -Value $SPassword -Scope Global
 }
 Function Write-Settings {
-    $ContentSettings = @("[Settings]", "SettingsSet=1", "[Admin Settings]", "DomainAdminGroup=$($EncDomainADminGroupSet)", "[Log Path]", "LogPath=$(EncLogPathSet)")
+    Clear-Content -Path "$PSScriptRoot\_data\settings.ini"
+    $ContentSettings = @("[Settings]", "SettingSet=1", "[Admin Settings]", "DomainAdminGroup=$EncDomainADminGroupSet", "[Log Path]", "LogPath=$EncLogPathSet")
     Set-Content -Path "$PSScriptRoot\_data\settings.ini" -Value $ContentSettings
-    $ContentCredntail = @("[ADM]", "ADMUsername=($EncADMUserSet)", "ADMPassword=$($EncADMPassSet)", "[Standard User]", "Username=$($EncSUserSet)", "Password=$($EncSPassSet)")
+
+    Clear-Content -Path "$PSScriptRoot\_data\Credential.ini"
+    $ContentCredntail = @("[ADM]", "ADMUsername=$EncADMUserSet", "ADMPassword=$EncADMPassSet", "[Standard User]", "Username=$EncSUserSet", "Password=$EncSPassSet")
     Set-Content -Path "$PSScriptRoot\_data\Credential.ini" -Value $ContentCredntail
 }
 Function Read-Settings {
@@ -548,8 +535,8 @@ $XamlAdmin = @"
   					<TextBlock Foreground="#ffffff" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="Wrap" Text="Admin Username" Margin="127,292,0,0"/>
   					<TextBlock Foreground="#ffffff" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="Wrap" Text="Admin Password" Margin="275,293,0,0"/>
 					<Button FontSize="14" Background="#171520" Foreground="#ffffff" BorderThickness="0" Content="Get-Values" Name="Values_BT" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="267,405,0,0"/>
-					<TextBlock Foreground="#ffffff" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="Wrap" Text="LogPath" Name="LogPath_TB" Margin="110,41,0,0"/>
-					<TextBox Background="#171520" Foreground="#ffffff" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Height="23" Width="230" TextWrapping="Wrap" Margin="20,60,0,0"/>    
+					<TextBlock Foreground="#ffffff" HorizontalAlignment="Left" VerticalAlignment="Top" TextWrapping="Wrap" Text="LogPath" Margin="110,41,0,0"/>
+					<TextBox Background="#171520" Foreground="#ffffff" BorderThickness="0" HorizontalAlignment="Left" VerticalAlignment="Top" Name="LogPath_TB" Height="23" Width="230" TextWrapping="Wrap" Margin="20,60,0,0"/>    
 					<ListBox Foreground="#ffffff" Background="#000000" HorizontalAlignment="Left" BorderBrush="Black" BorderThickness="1" Height="170" VerticalAlignment="Top" Width="268" Margin="253,60,0,0" Name="Settings_LB"/>
 					  
 				</Grid>
@@ -576,6 +563,7 @@ $WindowADM = [Windows.Markup.XamlReader]::Parse($XamlAdmin)
 [xml]$xmlAdmin = $XamlAdmin
 
 $xmlAdmin.SelectNodes("//*[@Name]") | ForEach-Object { Set-Variable -Name $_.Name -Value $WindowADM.FindName($_.Name) }
+
 
 ## Tabs
 $Tab1BT.Add_Click({Tab1Click $this $_})
@@ -933,8 +921,8 @@ $Go_BT.Add_Click({
     Encrypt-Setting-ADMPassword
     Encrypt-Setting-SUserName
     Encrypt-Setting-SPassword
-    Start-Sleep -Seconds 2
     Write-Settings
+    [System.Windows.Forms.MessageBox]::Show('Settings set. App will close now!', 'Info', 'Ok', 'Info')
 })
 $Values_BT.Add_Click({
     # Get Values from Ini
