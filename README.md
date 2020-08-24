@@ -9,6 +9,7 @@ Many thanks to Brent and his script(https://gallery.technet.microsoft.com/script
 Havent tested the new install/Setup and uninstall scripts yet. Feel Free to test, edit and improve.
 # Using the source code #
 You may be interest in using the source code, you might need to change some values in the script. You need to alter the global vars. You will later need those vars to encrypt and decrypt settings to save them in the ini files. You might want to enter those ecrypted setting directly in the setup.ps1 so all you need to do is run setup ps1 and you will no need to alter the ini manualy.
+But be careful I had to replace $PSScriptRoot with something else which means your working directory has to be the same as of the script. I have used VS Code and had errors when I just pressed F5, please take this note.
 # Setup #
 There is a setup.exe which will create directories aswell as config files. Don't move the exe, the exe is bound to its initial location because it need its config files.
 
