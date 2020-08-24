@@ -7,6 +7,7 @@ Many thanks to Berend and his script(https://gallery.technet.microsoft.com/scrip
 
 # Conclusion #
 Havent tested the new install/Setup and uninstall scripts yet. Feel Free to test, edit and improve.
+
 # Setup #
 There is a setup.exe which will create directories aswell as config files. Don't move the exe, the exe is bound to its initial location because it need its config files.
 
