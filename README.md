@@ -6,7 +6,9 @@ Here my Tool enters the game. You may use an uprevileged account but you can all
 Many thanks to Berend and his script(https://gallery.technet.microsoft.com/scriptcenter/PowerShell-Script-410ef9df) i used to encrypt and decrypt settings so noone can change them, or if changed the program will be brocken, but yout at least know who broke it ^-^.
 
 # Setup #
-There is a setup.exe which will create directories aswell as config files. Don't move the exe, make a shortcut, the exe is bound to its initial location because it need its config files.
+There is a setup.exe which will create directories aswell as config files. Don't move the exe, the exe is bound to its initial location because it need its config files.
+
+After the setup you should be able to statrt the Security-App.exe, but please dont move it arround since it depends of the config file location, just make a shortcut. Also never start it as admin because it would break the concept.
 ## Requiments ##
 There is some needed software as well as optional software that needs to be installed for the application in order to work properly.
 
