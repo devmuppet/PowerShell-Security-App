@@ -7,7 +7,6 @@ $INITPW=""
 
 ## endregion Global Vars
 
-
 ## Functions
 Function Get-SettingsINI {
     $SettingsINI = Get-Content "$PSScriptRoot\_data\settings.ini"
@@ -395,15 +394,15 @@ Function Set-Settings{
 }
 Function Load-PS-Log{
     $PSLog= Get-Content -Path "$LogPath\PS-Log_$date.log"
-    Set-Variable -Name LoadedPSLog -Value $PSLog -Scope Global
+    return $PSLog
 }
 Function Load-CMD-Log{
     $CMDLog= Get-Content -Path "$LogPath\CMD-Log_$date.log"
-    Set-Variable -Name LoadedCMDLog -Value $CMDLog -Scope Global
+    return $CMDLog
 }
 Function Load-File-Log{
     $FileLog= Get-Content -Path "$LogPath\File-Log_$date.log"
-    Set-Variable -Name LoadedFileLog -Value $FileLog -Scope Global
+    return $FileLog
 }
 ## Form Login
 
