@@ -20,7 +20,7 @@ Execute setup.exe and watch it running, no im making jokes, you might need to en
 ### Uninstall ###
 Execute uninstall.exe and the tool will destroy itself.
 # Usage #
-
+To use and compile it yourself  you need to change the values in the global var region. And use the Decrypt/Encrypt script to create the setting entries.
 ### Login ###
 ![Login GUI](https://github.com/seyo-IV/PowerShell-Security-App/blob/master/images/Login.PNG)
 
