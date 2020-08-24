@@ -8,7 +8,7 @@ Many thanks to Berend and his script(https://gallery.technet.microsoft.com/scrip
 # Setup #
 There is a setup.exe which will create directories aswell as config files. Don't move the exe, make a shortcut, the exe is bound to its initial location because it need its config files.
 ## Requiments ##
-There is some needed sioftware as well as optional software that needs to be installed for the application in order to work properly.
+There is some needed software as well as optional software that needs to be installed for the application in order to work properly.
 
 So what do we need?
 - PSReadLine which is mostly already installed on new hosts if i remember right iits installed at PowerShell 5.0 upwards. We need it for advanced PS logging.
