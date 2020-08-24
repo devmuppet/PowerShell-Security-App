@@ -3,7 +3,7 @@ Every of us knows it... you have to give remote control to some unknown person, 
 
 Here my Tool enters the game. You may use an uprevileged account but you can allways type your credentail into the application, which are not redable by the user and give him some of your power, to for exaple start and elevated shell or start an exe.
 
-Many thanks to Berend and his script(https://gallery.technet.microsoft.com/scriptcenter/PowerShell-Script-410ef9df) i used to encrypt and decrypt settings so noone can change them, or if changed the program will be brocken, but yout at least know who broke it ^-^.
+Many thanks to Brent and his script(https://gallery.technet.microsoft.com/scriptcenter/PowerShell-Script-410ef9df) i used to encrypt and decrypt settings so noone can change them, or if changed the program will be brocken, but yout at least know who broke it ^-^.
 
 # Conclusion #
 Havent tested the new install/Setup and uninstall scripts yet. Feel Free to test, edit and improve.
