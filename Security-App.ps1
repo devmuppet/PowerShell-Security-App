@@ -922,6 +922,7 @@ $Go_BT.Add_Click({
     Encrypt-Setting-SPassword
     Write-Settings
     [System.Windows.Forms.MessageBox]::Show('Settings set. App will close now!', 'Info', 'Ok', 'Info')
+    exit
 })
 $Values_BT.Add_Click({
     # Get Values from Ini
