@@ -394,14 +394,17 @@ Function Set-Settings{
     Set-Variable -Name LogPath -Value $DecLogPath -Scope Global
 }
 Function Load-PS-Log{
+    $date = $LogDate
     $PSLog= Get-Content -Path "$LogPath\PS-Log_$date.log"
     return $PSLog
 }
 Function Load-CMD-Log{
+    $date = $LogDate
     $CMDLog= Get-Content -Path "$LogPath\CMD-Log_$date.log"
     return $CMDLog
 }
 Function Load-File-Log{
+    $date = $LogDate
     $FileLog= Get-Content -Path "$LogPath\File-Log_$date.log"
     return $FileLog
 }
@@ -580,16 +583,19 @@ $LoadLog_BT.Add_Click({
     $FileLog=Load-File-Log
     $Output_LB.items.Clear()
     $Output_LB.items.Add("PowerShell Log")
+    $Output_LB.items.Add("-----------------")
     foreach($entry in $PSLog)
     {
         $Output_LB.items.Add($entry)
     }
     $Output_LB.items.Add("CMD Log")
+    $Output_LB.items.Add("----------")
     foreach($entry in $CMDLog)
     {
         $Output_LB.items.Add($entry)
     }
     $Output_LB.items.Add("File Log")
+    $Output_LB.items.Add("---------")
     foreach($entry in $FileLog)
     {
         $Output_LB.items.Add($entry)
@@ -626,7 +632,7 @@ $CMD_BT.Add_Click({
             Set-Variable -Name CMDHistory -Value $history -Scope global
             }
             $Process.WaitForExit()
-            CMD-Log -Permission Admin
+            CMD-Log -Permission User
         
     }
         else
@@ -912,7 +918,7 @@ $OpenFile_BT.Add_Click({
     }
 })
 $Close_BT.Add_Click({
-	$WindowAdmin.close()
+	$WindowADM.close()
 })
 $Go_BT.Add_Click({
     Encrypt-Setting-ADMGroup
@@ -1031,16 +1037,19 @@ $LoadLog_BT.Add_Click({
     $FileLog=Load-File-Log
     $Output_LB.items.Clear()
     $Output_LB.items.Add("PowerShell Log")
+    $Output_LB.items.Add("-----------------")
     foreach($entry in $PSLog)
     {
         $Output_LB.items.Add($entry)
     }
     $Output_LB.items.Add("CMD Log")
+    $Output_LB.items.Add("----------")
     foreach($entry in $CMDLog)
     {
         $Output_LB.items.Add($entry)
     }
     $Output_LB.items.Add("File Log")
+    $Output_LB.items.Add("---------")
     foreach($entry in $FileLog)
     {
         $Output_LB.items.Add($entry)
@@ -1077,7 +1086,7 @@ $CMD_BT.Add_Click({
             Set-Variable -Name CMDHistory -Value $history -Scope global
             }
             $Process.WaitForExit()
-            CMD-Log -Permission Admin
+            CMD-Log -Permission User
         
     }
         else
