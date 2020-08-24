@@ -4,19 +4,15 @@ $host.UI.RawUI.WindowTitle = "Security-App Uinstall"
 
 Write-Host -ForegroundColor Yellow "[INFO] `t Removing clink."
 Start-Process cmd.exe -ArgumentList '/c choco uninstall clink -y' -Wait
-Write-Host -ForegroundColor Yellow "[OK] `t Done removing clink."
+Write-Host -ForegroundColor Green "[OK] `t Done removing clink."
 "`n"
-sleep -sec 3
+Start-Sleep -Seconds 3
 Write-Host -ForegroundColor Yellow "[INFO] `t Uninstalling chocolatey direcories."
 Remove-Item -Path C:\ProgramData\chocolatey -Recurse -Force
-Write-Host -ForegroundColor Yellow "[OK] `t Done uninstalling chocolatey."
+Write-Host -ForegroundColor Green "[OK] `t Done uninstalling chocolatey."
 "`n"
 Write-Host -ForegroundColor Yellow "[INFO] `t Deleting direcories."
-$Files = Get-ChildItem -Path $Root -Recurse
-ForEach-Object($file in $Files)
-{
-    Remove-Item -Path $file.FullName -Force
-}
-Write-Host -ForegroundColor Yellow "[OK] `t Done deleting direcories."
+Get-ChildItem -Path $Root | Remove-Item -Force -Recurse
+Write-Host -ForegroundColor Green "[OK] `t Done deleting direcories."
 Write-Output -InputObject "Press any key to continue..."
 [void]$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
