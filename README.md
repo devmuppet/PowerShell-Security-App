@@ -3,10 +3,8 @@ Every of us knows it... you have to give remote control to some unknown person, 
 
 Here my Tool enters the game. You may use an uprevileged account but you can allways type your credentail into the application, which are not redable by the user and give him some of your power, to for exaple start and elevated shell or start an exe.
 
-Many thanks to Brent and his script(https://gallery.technet.microsoft.com/scriptcenter/PowerShell-Script-410ef9df) i used to encrypt and decrypt settings so noone can change them, or if changed the program will be brocken, but yout at least know who broke it ^-^.
+Many thanks to Brent and his script(https://gallery.technet.microsoft.com/scriptcenter/PowerShell-Script-410ef9df) i used to encrypt and decrypt settings so noone can change them, or if changed the program will be brocken, but you at least know who broke it ^-^.
 
-# Conclusion #
-Havent tested the new install/Setup and uninstall scripts yet. Feel Free to test, edit and improve.
 # Using the source code #
 You may be interest in using the source code, you might need to change some values in the script. You need to alter the global vars. You will later need those vars to encrypt and decrypt settings to save them in the ini files. You might want to enter those ecrypted setting directly in the setup.ps1 so all you need to do is run setup ps1 and you will no need to alter the ini manualy.
 But be careful I had to replace $PSScriptRoot with something else which means your working directory has to be the same as of the script. I have used VS Code and had errors when I just pressed F5, please take this note.
