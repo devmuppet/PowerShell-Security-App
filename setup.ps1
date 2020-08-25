@@ -9,8 +9,8 @@ New-item -ItemType Directory -Path $Root -Name "_data"
 Write-Host -ForegroundColor Green "[OK] `t Done creating direcories."
 "`n"
 Write-Host -ForegroundColor Yellow "[INFO] `t Creating config files."
-$settingsINI = @("[Settings]","SettingSet=0","[Admin Settings]","DomainAdminGroup=","[Log Path]","LogPath=")
-$credentailINI = @("[ADM]","ADMUsername=","ADMPassword=","[Standard User]","Username=","Password=")
+$settingsINI = @("[Settings]","SettingSet=0","[Admin Settings]","DomainAdminGroup=UoO/0Do4t96SGbUpgMqB8w==","[Log Path]","LogPath=vGFgscE8CRCXYqC4+Cp3WQ==")
+$credentailINI = @("[ADM]","ADMUsername=tMqniQcteZlNkxYQ++MApQ==","ADMPassword=tMqniQcteZlNkxYQ++MApQ==","[Standard User]","Username=a9NYndtdxI3149R19HS1xA==","Password=PTy/K/fLjtK9biwekjdDYg==")
 Set-Content -Path "$Root\_data\settings.ini" -Value $settingsINI
 Set-Content -Path "$Root\_data\credential.ini" -Value $credentailINI
 Write-Host -ForegroundColor Green "[OK] `t Done creating configs."
@@ -246,7 +246,6 @@ Set-Content -Path "$Root\_data\settings" -Value $ClinkSettings
 Set-Content -Path "$Root\_code\preRequiments.ps1" -Value $preRequiments
 Set-Content -Path "$Root\_code\setupPS.ps1" -Value $setupPS
 Set-Content -Path "$Root\_code\setupAD.ps1" -Value $setupAD
-Set-Content -Path "$Root\_code\setupCMD.ps1" -Value $setupCMD
 
 try{
     $testchoco = Test-Path -Path C:\ProgramData\chocolatey
@@ -265,7 +264,9 @@ try{
     Write-Host -ForegroundColor Green "[OK] `t Setup of Active Directory is complete."
     "`n"
     Write-Host -ForegroundColor Yellow "[INFO] `t Starting CMD setup."
-    Powershell.exe -noprofile -File "$Root\_code\SetupCMD.ps1"
+    Start-Process cmd.exe -argumentList 'cmd.exe /c "choco install clink -y"' -Wait -PassThru -NoNewWindow
+    Start-Sleep -sec 3
+    Start-Process cmd.exe -argumentList '/c exit' -Wait -PassThru -NoNewWindow
     $User = $env:UserName
     Set-Content "C:\Users\$user\AppData\Local\clink\settings" -Value $ClinkSettings
     Write-Host -ForegroundColor Green "[OK] `t Setup of CMD is complete."
@@ -275,7 +276,6 @@ Start-Sleep -Seconds 2
 Write-Host -ForegroundColor Yellow "[INFO] `t Starting cleanup."
 Remove-item -Path "$Root\_code\preRequiments.ps1"
 Remove-item -Path "$Root\_code\SetupAD.ps1"
-Remove-item -Path "$Root\_code\SetupCMD.ps1"
 Remove-item -Path "$Root\_code\SetupPS.ps1"
 Write-Host -ForegroundColor Green "[OK] `t Cleanup complete."
 
