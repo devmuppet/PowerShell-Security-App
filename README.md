@@ -25,7 +25,7 @@ So what do we need?
 ### Install ###
 Execute setup.exe and watch it running, no im making jokes, you might need to enter some infos as well as decide to install optional software.
 ### Uninstall ###
-Execute uninstall.exe and the tool will destroy itself.
+Execute uninstall.exe and the tool will destroy itself. Ok i couldnt find a way to delete the uninstaller it self, sou you still have to delete the uninstaller.
 # Usage #
 To use and compile it yourself  you need to change the values in the global var region. And use the Decrypt/Encrypt script to create the setting entries.
 ### Login ###
