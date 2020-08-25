@@ -47,6 +47,6 @@ Here lands the output of your usage of the tools. But you can also load the logs
 
 This are is reserved for admin only. So provide admin credentails on login you can access it. Once you set setings the app will close and you have to reopen it.
 
-For security reasons i decided to hash the settings so noone can just read the ini and change username/password. The settings are set all at once but if you leave a textbox blank the old value is taken. After setting the settings you need to restart the App.
+For security reasons i decided to hash the settings so noone can just read the ini and change username/password. The settings are set all at once but if you leave a textbox blank the old value is taken. After setting the settings the app will close.
 
 To see the current locaded settings press "Get-Values".
