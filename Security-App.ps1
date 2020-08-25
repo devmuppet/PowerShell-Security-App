@@ -8,7 +8,7 @@ $INITPW="" ## 8 digit long string
 
 ## endregion Global Vars
 
-## Functions
+# Functions
 Function Get-SettingsINI {
     $SettingsINI = Get-Content "$Root\_data\settings.ini"
     return $SettingsINI 
@@ -174,16 +174,15 @@ $password = $Credentials.GetNetworkCredential().password
 $computer = $env:COMPUTERNAME
 
 Add-Type -AssemblyName System.DirectoryServices.AccountManagement
-$obj = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',
-$computer)
+$obj = New-Object System.DirectoryServices.AccountManagement.PrincipalContext('machine',$computer)
 $check = $obj.ValidateCredentials($username, $password)
 if ($check)
 {
- return $false
+ return $true
 }
 else
 {
- return $true
+ return $false
 }
 }
 Function Check-Local-Admin-AD {
@@ -603,7 +602,7 @@ $LoadLog_BT.Add_Click({
 })
 
 $CMD_BT.Add_Click({
-    if($asAdmin_CB.Checked -eq $true)
+    if($asAdmin_CB.isChecked -eq $true)
     {
         $Check = $true    
     }
@@ -666,7 +665,7 @@ $CMD_BT.Add_Click({
     }
 })
 $PowerShell_BT.Add_Click({
-    if($asAdmin_CB.Checked -eq $true)
+    if($asAdmin_CB.isChecked -eq $true)
     {
         $Check = $true    
     }
@@ -739,7 +738,7 @@ $AD_BT.Add_Click({
     
 })
 $SM_BT.Add_Click({
-    if($asAdmin_CB.Checked -eq $true)
+    if($asAdmin_CB.isChecked -eq $true)
     {
         $Check = $true    
     }
@@ -768,7 +767,7 @@ $SM_BT.Add_Click({
 $Credential_BT.Add_Click({
     if($UN -eq $null){$TempUN = $env:USERNAME}else{$TempUN = $UN}
     $Output_LB.items.Clear()
-    $Output_LB.Items.Add("Current loged in User: $($TempUN)")
+    $Output_LB.Items.Add("$(GD)    Current loged in User: $($TempUN)")
     
     $CredSet = $null
     $UN = $null
@@ -779,7 +778,9 @@ $Credential_BT.Add_Click({
     {
         if($Mode_CB.Text -eq "AD")
         {
+            Set-Variable -Name Credentials -Value $Cred -Scope global
             $CredCheck=Cred-Check-AD
+            Set-Variable -Name Credentials -Value $null -Scope global
             if($CredCheck)
             {
                 Set-Variable -Name CredSet -Value $true -Scope global
@@ -790,10 +791,17 @@ $Credential_BT.Add_Click({
 
                 $Output_LB.Items.Add("$(GD)    Current user switched to $UserName.")                
             }
+            else
+            {
+                [System.Windows.Forms.MessageBox]::Show('Provided credentail are invalid!', 'Error', 'Ok', 'Error')
+            } 
         }
         elseif($Mode_CB.Text -eq "Local")
         {
+            Set-Variable -Name Credentials -Value $Cred -Scope global
             $CredCheck=Cred-Check-Local
+            Set-Variable -Name Credentials -Value $null -Scope global
+
             if($CredCheck)
             {
                 Set-Variable -Name CredSet -Value $true -Scope global
@@ -803,6 +811,10 @@ $Credential_BT.Add_Click({
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
 
                 $Output_LB.Items.Add("$(GD)   Current user switched to $UserName.")                
+            }
+            else
+            {
+                [System.Windows.Forms.MessageBox]::Show('Provided credentail are invalid!', 'Error', 'Ok', 'Error')
             }            
         } 
     }	
@@ -838,7 +850,7 @@ $CLA_BT.Add_Click({
     }
 })
 $OpenFile_BT.Add_Click({
-    if($asAdmin_CB.Checked -eq $true)
+    if($asAdmin_CB.isChecked -eq $true)
     {
         $Check = $true    
     }
@@ -1056,7 +1068,7 @@ $LoadLog_BT.Add_Click({
     }
 })
 $CMD_BT.Add_Click({
-    if($asAdmin_CB.Checked -eq $true)
+    if($asAdmin_CB.isChecked -eq $true)
     {
         $Check = $true    
     }
@@ -1121,7 +1133,7 @@ $CMD_BT.Add_Click({
     }
 })
 $PowerShell_BT.Add_Click({
-    if($asAdmin_CB.Checked -eq $true)
+    if($asAdmin_CB.isChecked -eq $true)
     {
         $Check = $true    
     }
@@ -1195,7 +1207,7 @@ $AD_BT.Add_Click({
 $Output_LB.Items.Add("$(GD)   Active Directory query successfully started.")
 })
 $SM_BT.Add_Click({
-    if($asAdmin_CB.Checked -eq $true)
+    if($asAdmin_CB.isChecked -eq $true)
     {
         $Check = $true    
     }
@@ -1235,7 +1247,9 @@ $Credential_BT.Add_Click({
     {
         if($Mode_CB.Text -eq "AD")
         {
+            Set-Variable -Name Credentials -Value $Cred -Scope global
             $CredCheck=Cred-Check-AD
+            Set-Variable -Name Credentials -Value $null -Scope global
             if($CredCheck)
             {
                 Set-Variable -Name CredSet -Value $true -Scope global
@@ -1246,10 +1260,16 @@ $Credential_BT.Add_Click({
 
                 $Output_LB.Items.Add("$(GD)    Current user switched to $UserName.")                
             }
+            else
+            {
+                [System.Windows.Forms.MessageBox]::Show('Provided credentail are invalid!', 'Error', 'Ok', 'Error')
+            } 
         }
         elseif($Mode_CB.Text -eq "Local")
         {
+            Set-Variable -Name Credentials -Value $Cred -Scope global
             $CredCheck=Cred-Check-Local
+            Set-Variable -Name Credentials -Value $null -Scope global
             if($CredCheck)
             {
                 Set-Variable -Name CredSet -Value $true -Scope global
@@ -1259,7 +1279,11 @@ $Credential_BT.Add_Click({
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
 
                 $Output_LB.Items.Add("$(GD)   Current user switched to $UserName.")                
-            }            
+            }
+            else
+            {
+                [System.Windows.Forms.MessageBox]::Show('Provided credentail are invalid!', 'Error', 'Ok', 'Error')
+            }             
         } 
     }	
 })
@@ -1294,7 +1318,7 @@ $CLA_BT.Add_Click({
     }
 })
 $OpenFile_BT.Add_Click({
-    if($asAdmin_CB.Checked -eq $true)
+    if($asAdmin_CB.isChecked -eq $true)
     {
         $Check = $true    
     }
