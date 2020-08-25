@@ -12,7 +12,7 @@ Remove-Item -Path C:\ProgramData\chocolatey -Recurse -Force
 Write-Host -ForegroundColor Green "[OK] `t Done uninstalling chocolatey."
 "`n"
 Write-Host -ForegroundColor Yellow "[INFO] `t Deleting direcories."
-Get-ChildItem -Path $Root | Remove-Item -Force -Recurse
+Get-ChildItem -Path $Root | Remove-Item -Force -Recurse -Exclude "uninstall.exe"
 Write-Host -ForegroundColor Green "[OK] `t Done deleting direcories."
 Write-Output -InputObject "Press any key to continue..."
 [void]$host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
