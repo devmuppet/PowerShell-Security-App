@@ -8,7 +8,7 @@ Here my Tool enters the game. You may use an uprevileged account but you can all
 Many thanks to Brent and his script(https://gallery.technet.microsoft.com/scriptcenter/PowerShell-Script-410ef9df) i used to encrypt and decrypt settings so noone can change them, or if changed the program will be brocken, but you at least know who broke it ^-^.
 
 # Using the source code #
-You may be interest in using the source code, you might need to change some values in the script. You need to alter the global vars. You will later need those vars to encrypt and decrypt settings to save them in the ini files. You might want to enter those ecrypted setting directly in the setup.ps1 so all you need to do is run setup ps1 and you will no need to alter the ini manualy.
+You may be interested in using the source code, you might need to change some values in the script. You need to alter the global vars. You will later need those vars to encrypt and decrypt settings to save them in the ini files. You might want to enter those ecrypted setting directly in the setup.ps1 so all you need to do is run setup ps1 and you will no need to alter the ini manualy.
 But be careful I had to replace `$PSScriptRoot` with something else(`Split-Path -Parent -Path ([Environment]::GetCommandLineArgs()[0])`) which means you would not be able to use the code unless you compile it, or you could replace `$Root` with `$PSScriptRoot` in Security-App.ps1.
 # Setup #
 There is a setup.exe which will create directories aswell as config files. Don't move the exe, the exe is bound to its initial location because it need its config files.
