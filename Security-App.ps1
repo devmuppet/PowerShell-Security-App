@@ -8,7 +8,7 @@ $INITPW="" ## 8 digit long string
 
 ## endregion Global Vars
 
-# Functions
+## Functions
 Function Get-SettingsINI {
     $SettingsINI = Get-Content "$Root\_data\settings.ini"
     return $SettingsINI 
@@ -85,7 +85,7 @@ Function PS-Log {
         
  $date = $LogDate
  
- Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: History `n" | Out-File "$LogPath\PS-Log_$date.log" -Append
+ Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: History" | Out-File "$LogPath\PS-Log_$date.log" -Append
  Write-Output $PSHistory | Out-File "$LogPath\PS-Log_$date.log" -Append
  }
         else
@@ -94,7 +94,7 @@ Function PS-Log {
  $HostName = hostname
  $date = $LogDate
  
- Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: History `n" | Out-File "$LogPath\PS-Log_$date.log" -Append
+ Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: History" | Out-File "$LogPath\PS-Log_$date.log" -Append
  Write-Output $PSHistory | Out-File "$LogPath\PS-Log_$date.log" -Append    }
         }
         
@@ -111,7 +111,7 @@ Function CMD-Log {
         
  $date = $LogDate
  
- Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: History `n" | Out-File "$LogPath\CMD-Log_$date.log" -Append
+ Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: History" | Out-File "$LogPath\CMD-Log_$date.log" -Append
  Write-Output $CMDHistory | Out-File "$LogPath\CMD-Log_$date.log" -Append
  }
         else
@@ -120,7 +120,7 @@ Function CMD-Log {
  $HostName = hostname
  $date = $LogDate
  
- Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: History `n" | Out-File "$LogPath\CMD-Log_$date.log" -Append
+ Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: History" | Out-File "$LogPath\CMD-Log_$date.log" -Append
  Write-Output $CMDHistory | Out-File "$LogPath\CMD-Log_$date.log" -Append
  }
         }
@@ -139,14 +139,14 @@ Function File-Log {
  $user = $env:USERNAME
  $HostName = hostname
  $date = $LogDate
- Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: File `n Datei wurde geöffnet: $($File.FileName)" | Out-File "$LogPath\File-Log_$date.log" -Append
+ Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: File `n File opened: $($File.FileName)" | Out-File "$LogPath\File-Log_$date.log" -Append
  }
         else
  {
  $user = $UN
  $HostName = hostname
  $date = $LogDate
- Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: File `n Datei wurde geöffnet: $($File.FileName)" | Out-File "$LogPath\File-Log_$date.log" -Append
+ Write-Output "User: $user; Host: $HostName; Permission: $Permission; Log: File `n File opened: $($File.FileName)" | Out-File "$LogPath\File-Log_$date.log" -Append
  }
         
         }
