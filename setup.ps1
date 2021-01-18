@@ -9,8 +9,8 @@ New-item -ItemType Directory -Path $Root -Name "_data"
 Write-Host -ForegroundColor Green "[OK] `t Done creating direcories."
 "`n"
 Write-Host -ForegroundColor Yellow "[INFO] `t Creating config files."
-$settingsINI = @("[Settings]","SettingSet=0","[Admin Settings]","DomainAdminGroup=UoO/0Do4t96SGbUpgMqB8w==","[Log Path]","LogPath=vGFgscE8CRCXYqC4+Cp3WQ==")
-$credentailINI = @("[ADM]","ADMUsername=tMqniQcteZlNkxYQ++MApQ==","ADMPassword=tMqniQcteZlNkxYQ++MApQ==","[Standard User]","Username=a9NYndtdxI3149R19HS1xA==","Password=PTy/K/fLjtK9biwekjdDYg==")
+$settingsINI = @("[Settings]","SettingSet=0","[Admin Settings]","DomainAdminGroup=oCzHYDIz4djPYXxxeSzgeg==","[Log Path]","LogPath=sLP+UVLn0MRezZcommYnow==")
+$credentailINI = @("[ADM]","ADMUsername=iBoqEsvutYcWZWX89wn6/g==","ADMPassword=iBoqEsvutYcWZWX89wn6/g==","[Standard User]","Username=Yp9unjM+/EXAqmZsFoTZKQ==","Password=S4DxHDx53kCqtJOn4t95zg==")
 Set-Content -Path "$Root\_data\settings.ini" -Value $settingsINI
 Set-Content -Path "$Root\_data\credential.ini" -Value $credentailINI
 Write-Host -ForegroundColor Green "[OK] `t Done creating configs."
