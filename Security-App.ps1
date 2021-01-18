@@ -784,7 +784,7 @@ $Credential_BT.Add_Click({
             if($CredCheck)
             {
                 Set-Variable -Name CredSet -Value $true -Scope global
-                Set-Variable -Name UN -Value $UserName -Scope global
+                Set-Variable -Name UN -Value $Cred.UserName -Scope global
                 Set-Variable -Name Credentials -Value $Cred -Scope global
                 $UserName = $Cred.UserName
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
@@ -805,7 +805,7 @@ $Credential_BT.Add_Click({
             if($CredCheck)
             {
                 Set-Variable -Name CredSet -Value $true -Scope global
-                Set-Variable -Name UN -Value $UserName -Scope global
+                Set-Variable -Name UN -Value $Cred.UserName -Scope global
                 Set-Variable -Name Credentials -Value $Cred -Scope global
                 $UserName = $Cred.UserName
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
@@ -1253,7 +1253,7 @@ $Credential_BT.Add_Click({
             if($CredCheck)
             {
                 Set-Variable -Name CredSet -Value $true -Scope global
-                Set-Variable -Name UN -Value $UserName -Scope global
+                Set-Variable -Name UN -Value $Cred.UserName -Scope global
                 Set-Variable -Name Credentials -Value $Cred -Scope global
                 $UserName = $Cred.UserName
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
@@ -1273,7 +1273,7 @@ $Credential_BT.Add_Click({
             if($CredCheck)
             {
                 Set-Variable -Name CredSet -Value $true -Scope global
-                Set-Variable -Name UN -Value $UserName -Scope global
+                Set-Variable -Name UN -Value $Cred.UserName -Scope global
                 Set-Variable -Name Credentials -Value $Cred -Scope global
                 $UserName = $Cred.UserName
                 $UserName = $UserName -replace "$($env:USERDOMAIN)\\", ""
